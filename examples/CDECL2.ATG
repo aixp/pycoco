@@ -1,0 +1,45 @@
+$CX   /* Generate Main Module, C++ */
+COMPILER Decl
+/* Translate simple C declarations into English
+   Based on Kernighan and Ritchie: "C Programming language", page 122
+   See also: Parr et.al. "PCCTS reference manual", page 53 in ACM SIGPLAN
+   Notices 27(2), 88-165, 1992 */
+
+CHARACTERS
+  digit =  "0123456789" .
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyx_" .
+
+TOKENS
+  number = digit { digit } .
+  name = letter { letter } .
+
+IGNORE CHR(9) .. CHR(13)
+
+PRODUCTIONS
+
+  Decl       =
+               { name                     (. Tipe = Parser.token.val     .)
+                 Dcl                      (. print ' %s' % Tipe,         .)
+                 ";" } .
+
+  Dcl        =   "*" Dcl                  (. print 'pointer to',         .)
+               | DirectDcl .
+
+  DirectDcl  =
+                name                      (. Name = Parser.token.val
+                                             print '%s is' % Name,       .)
+                 Descriptor
+               | "(" Dcl ")" Descriptor .
+
+  Descriptor =
+               [  "["                     (. print 'array',              .)
+                  ( number                (. buf = Parser.token.val
+                                             print '[%d]' % int(buff),   .)
+                    | /* no dimension */
+                  )
+                  "]"                     (. print 'of',                 .)
+                  Descriptor
+                | "(" ")"                 (. print 'function returning', .)
+               ] .
+
+END Decl.

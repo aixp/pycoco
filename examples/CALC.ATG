@@ -1,0 +1,98 @@
+COMPILER Calc
+
+   # Create an array of 1000 memory registers
+   VARS = [ 0 ] * 1000
+
+   def getSpix( self ):
+      varName = self.token.val.upper()   # Grab the most recently parsed lexeme
+
+      if len(varName) >= 2:
+         return 26*(ord(varName[1])-ord('A'))+(ord(varName[0])-ord('A'))
+      else:
+         return ord(varName[0])-ord('A')
+
+   def getNumber( self ):
+      return int(self.token.val)
+
+   def newVar( self, spix ):
+      self.VARS[ spix ] = 0
+
+   def getVar( self, spix ):
+      return self.VARS[ spix ]
+
+   def writeVal( self, val ):
+      print val
+
+   def readVal( self, spix ):
+      self.VARS[ spix ] = int(raw_input( 'Read >' ))
+
+   def setVar( self, spix, val ):
+      self.VARS[ spix ] = val
+
+IGNORECASE    
+
+CHARACTERS
+  letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+  digit  = "0123456789".
+  eol    = CHR(13) .
+  lf     = CHR(10) .
+
+TOKENS
+  ident  = letter {letter | digit} .
+  number = digit {digit} .
+
+COMMENTS
+  FROM '--' TO eol
+
+IGNORE eol + lf
+
+PRODUCTIONS
+  Calc =
+    [Declarations] StatSeq .
+
+  Declarations
+    =
+       'VAR'
+       Ident<out spix>                    (. self.newVar(spix)       .)
+       { ',' Ident<out spix>              (. self.newVar(spix)       .)
+       } ';'
+    .
+
+  StatSeq =
+    Stat {';' Stat}.
+
+  Stat
+    =
+        "READ"  Ident<out spix>           (. self.readVal(spix)      .)
+      | "WRITE" Expr<out val>             (. self.writeVal(val)      .)
+      | Ident<out spix> ":=" Expr<out val>(. self.setVar(spix, val)  .)
+    .
+
+  Expr<out exprVal>
+    =
+      Term<out exprVal>
+      {  '+' Term<out termVal>            (. exprVal += termVal .)
+      |  '-' Term<out termVal>            (. exprVal -= termVal .)
+      }
+    .
+
+  Term<out termVal>
+    =
+      Fact<out termVal>
+      {  '*' Fact<out factVal>            (. termVal *= factVal .)
+      |  '/' Fact<out factVal>            (. termVal /= factVal .)
+      }
+    .
+
+  Fact<out factVal>
+    =
+         Ident<out spix>                  (. factVal = self.getVar(spix) .)
+      |  number                           (. factVal = self.getNumber()  .)
+      | '(' Expr<out factVal> ')'
+    .
+
+  Ident<out spix>
+    = ident                               (. spix = self.getSpix()   .)
+    .
+
+END Calc.

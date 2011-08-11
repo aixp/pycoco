@@ -1,0 +1,62 @@
+COMPILER structDefs
+
+PRODUCTIONS
+
+   structDefs = def { def } .
+
+   def =
+      typedef
+      | structDef
+      | unionDef
+      | enumeration
+      .
+
+   typedef =
+      'typedef' ( structDef | unionDef | enumeration ) newTypeName .
+
+   structDef =
+      'struct' [ TAG ]
+         '{'
+         fieldDef ';'
+         { fieldDef ';' }
+         '}' [ ';' ]
+      .
+
+   unionDef =
+      'union' [ TAG ]
+         '{'
+         fieldDef ';'
+         { fieldDef ';' }
+         '}' [ ';' ]
+      .
+
+   fieldDef =
+      typeName decl { ',' decl }
+      .
+
+   decl =
+      '*' decl | directDecl
+      .
+
+   directDecl =
+      name Descriptor
+      | '(' decl ')' Descriptor
+      .
+
+   descriptor =
+      '[' [number] ']' Descriptor
+      | '(' ( '*' decl | fieldDef { ',' fieldDef } ) ')'
+      /*| '(' CONTEXT ('*') decl ')'
+      | '(' fieldDef { ',' fieldDef } ')' */
+      .
+
+   enumeration =
+      'enum' [ TAG ]
+         '{'
+         name [ '=' value ]
+         { ',' name [ '=' value ] }
+         '}' [ ';' ]
+      .
+
+END structDefs.
+

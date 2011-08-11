@@ -1,0 +1,7 @@
+Coco/R v1.1.0rc for Python (May 16, 2007) - Translated by Ron Longo (ron.longo@cox.net)
+
+checking
+  No production for B
+1 errors detected
+
+trace output is in trace.txt

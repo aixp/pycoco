@@ -1,0 +1,128 @@
+CONTENTS
+
+   Setup
+   Using
+   makepi.how files
+
+
+
+Setup
+-----
+
+Pimaker is written in Coco as a practical example of a Coco application.
+
+To setup pimaker it must furst be compiled by coco as follows:
+
+      > python ../coco.py -c pimaker.atg
+
+This will generate pimaker.py, Pimaker's main module.
+
+
+Using
+-----
+
+Pimaker reads in a file that is very much like a makefile.  It then
+identifies the top-level targets (those upon which no other rules depend)
+and from them constructs a menu of targets.  Below the menu is a prompt.
+
+If the user types the name of a target, then that target will be built.
+
+If the user types 'showall', then all targets (top-level and not) will be
+lsited.
+
+If the user types 'exit', then pimaker will exit.
+
+
+makepi.how files
+----------------
+
+When pimaker first launches, it will search for and parse the file
+named makepi.how.  This file is much like a makefile.  It contains some
+initial code followed by rules for building named targets.  All code is
+written in Python.
+
+A build rule has the following syntax:
+
+      'target:' target1 target2 ...
+      'needs:'  dependency1 dependency2 ...
+      'todo:'   pythonCode
+                '$$$'
+
+      or
+
+      'target:' target ( description of target )
+      'needs:'  dependency1 dependency2 ...
+      'todo:'   pythonCode
+                '$$$'
+
+Note that targets are separated by spaces and are not enclosed in quotes.
+
+The first form actually specifies a group of targets all of which are built
+from the same dependancies using the same Python code.  Internally, pimaker
+will generate one rule for each target provided.
+
+The second form specifies a single target with some commentary in parenthesis.
+If this is a top-level target, then this commentary will appear beside the
+target name in the generated menu.
+
+All paths specified in 'target:' and 'needs:' should be specified using
+the UNIX convention where '/' separates directories.  Pimaker will convert
+these paths to platform specific forms before making use of them.
+
+MACROS
+
+Pimaker also has a limited macro capability.  Macros may be used in a
+dependency or in the todo section of the rule.  A macro takes the following
+form.
+
+   '${' MacroName [ '.' ElementSelector ] { ',' Mutation } '}'
+
+MacroName can be any python global variable.  Generatlly you will want to
+limit this to something declaired in the initialization section of the
+makepi.how file, or one of the 'special' variable names.  Any variable
+used for MacroName must expand into a string or python sequence of strings.
+
+If element selector is specified, it selects only a portion of the value
+specified by MacroName.  Currently, the only elements possible are for
+cases where MacroName expands into a filename path.  
+
+   dir    - the directory in which the named file exists.
+   name   - the filename without the path.
+   ext    - the extension portion of the filename.
+   base   - the filename without the path or extension.
+
+   In future implementations, additional elements may be possible.
+
+Mutation specifies a mutation on the value selected by
+MacroName.ElementSelector.  The following mutations are currently supported.
+
+   findSubstring '=' replaceValue
+      Having selected string, this mutation changes findSubstring into
+      replacevalue.
+
+Special Variables
+
+   TARGET - the target string for this rule.
+   NEEDS  - the list of dependencies.
+
+
+
+
+
+
+
+Examples
+
+
+   TARGET = '/home/myProject/myFile.py'
+
+
+   ${TARGET}                 expands to:   '/home/myProject/myFile.py'
+   ${TARGET.dir}             expands to:   '/home/myProject'
+   ${TARGET.name}            expands to:   'myFile.py'
+   ${TARGET.ext}             expands to:   'py'
+   ${TARGET.base}            expands to:   'myFile'
+
+   ${TARGET.base}.atg        expands to:   'myFile.atg'
+   ${TARGET.name,py=atg}     expands to:   'myFile.atg'
+

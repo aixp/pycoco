@@ -1,0 +1,16 @@
+Coco/R v1.1.0rc for Python (May 16, 2007) - Translated by Ron Longo (ron.longo@cox.net)
+
+checking
+  F deletable
+  LL(1) warning in A: a is the start of several alternatives
+  LL(1) warning in E: e is the start of several alternatives
+  LL(1) warning in C: a is the start & successor of a deletable structure
+  LL(1) warning in G: a is the start & successor of a deletable structure
+  LL(1) warning in H: a is the start & successor of a deletable structure
+  LL(1) warning in I: a is the start & successor of a deletable structure
+  LL(1) warning in J: a is the start & successor of a deletable structure
+  LL(1) warning in D: b is the start & successor of a deletable structure
+parser + scanner generated
+0 errors detected
+
+trace output is in trace.txt

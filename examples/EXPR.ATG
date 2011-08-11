@@ -1,0 +1,76 @@
+/* EXPR.ATG
+   Originally from the samples directory of the C/C++ implementation of coco.
+   Ported for use with CocoPy by Wayne Wiitanen, 13 DEC 2007 */
+
+$C   /* Generate Main Module */
+COMPILER Expr
+/* This is a simple expression calculator */
+
+   def getNumber( self ):
+      return int( self.token.val )
+    
+   def getVar( self ):
+      return self.token.val
+
+#----------------- Scanner Specifications ----------------------
+
+CHARACTERS
+    letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+    digit  = "0123456789".
+    tab    = CHR(9).
+    eol    = CHR(10).
+
+TOKENS
+    ident   =  letter {letter|digit}.
+    number  =  digit  { digit }.
+
+COMMENTS FROM "--" TO eol
+
+IGNORE eol+tab
+
+/*--------------------Parser Specification -------------------*/
+
+PRODUCTIONS
+    Expr = StatSeq .
+
+    StatSeq = SYNC { Stat ";" SYNC} .
+
+    Stat =                          (. value = 0 .)
+       Expression<out value>        (. print value .)
+      .
+
+    Expression<out result> =       (. result1 = 0; result2 = 0 .)
+       Term<out result1>
+       {   "+" Term<out result2>   (. result1 += result2 .)
+        | "-" Term<out result2>    (. result1 -= result2 .)
+       }                           (. result   = result1 .)
+       .
+
+    Term<out result> =              (. result1 = 1; result2 = 1 .)
+       Factor<out result1>
+       {   '*' Factor<out result2>  (. result1 *= result2 .)
+        | '/' Factor<out result2>   (. result1 /= result2 .)
+       }                            (. result   = result1 .)
+       .
+
+    Factor<out result> =            (. sign = 1 .)
+      [ "-"                         (. sign = -1 .)
+      ]
+      (   Number<out result>
+     | "(" Expression<out result> ")"
+      )                            (. result *= sign .)
+      .
+
+   Number<out result>
+   =                          
+   number                     (. result = self.getNumber() .)
+   .
+
+/*
+   Ident<out name>
+   =
+   ident                      (. name = self.getVar() .)
+   .
+*/
+
+END Expr.

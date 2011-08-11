@@ -1,0 +1,13 @@
+Coco/R v1.1.0rc for Python (May 16, 2007) - Translated by Ron Longo (ron.longo@cox.net)
+
+checking
+file TestResIllegal.atg : (8, 14) Misplaced resolver: no alternative.
+file TestResIllegal.atg : (9, 9) Resolver will never be evaluated. Place it at previous conflicting alternative.
+file TestResIllegal.atg : (10, 9) Misplaced resolver: no LL(1) conflict.
+file TestResIllegal.atg : (13, 11) Misplaced resolver: no alternative.
+file TestResIllegal.atg : (15, 12) Misplaced resolver: no LL(1) conflict.
+file TestResIllegal.atg : (20, 9) Misplaced resolver: no LL(1) conflict.
+file TestResIllegal.atg : (24, 8) Misplaced resolver: no LL(1) conflict.
+7 errors detected
+
+trace output is in trace.txt

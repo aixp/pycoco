@@ -1,0 +1,482 @@
+COMPILER Pascal
+
+IGNORECASE
+
+CHARACTERS
+
+   letter    = 'A' .. 'Z' + 'a' .. 'z' .
+   digit     = '0' .. '9' .
+   cr        = '\r' .
+   lf        = '\n' .
+   tab       = '\t' .
+   printable = '\x20' .. '\x7e' .
+   all       = '\x00' .. '\xff' .
+   stringCh  = printable - "'" .
+   sign      = '+-' .
+
+TOKENS
+
+   identifier      = letter { letter | digit } .
+   characterString = "'" { stringCh | "''" } "'" .
+   unsignedInteger = digit { digit } CONTEXT ( '..' ) .
+   unsignedReal    = digit { digit }
+                     ( '.' digit { digit } [ 'e' [ sign ] digit { digit } ]
+                     | 'e' [ sign ] digit { digit } ) .
+
+COMMENTS FROM '{' TO '}'
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+   Pascal =
+      ProgramHeading ';' Block '.' .
+
+   ProgramHeading =
+      'program' identifier [ ProgramParameterList ] .
+
+   ProgramParameterList =
+      '(' IdentifierList ')' .
+
+/*-----------------------------------------------------------------------*/
+
+   Block =
+      [ LabelDeclarationPart ]
+      [ ConstantDefinitionPart ]
+      [ TypeDefinitionPart ]
+      [ VariableDeclarationPart ]
+      { ProcedureAndFunctionDeclarationPart }
+      StatementPart
+      .
+
+   LabelDeclarationPart =
+      'label' unsignedInteger { ',' unsignedInteger } ';' .
+
+   ConstantDefinitionPart =
+      'const' ConstantDefinition ';' { ConstantDefinition ';' } .
+
+   TypeDefinitionPart =
+      'type' TypeDefinition ';' { TypeDefinition ';' } .
+
+   VariableDeclarationPart =
+      'var' VariableDeclaration ';' { VariableDeclaration ';' } .
+
+   ProcedureAndFunctionDeclarationPart =
+      ( ProcedureDeclaration | FunctionDeclaration ) ';' .
+
+   StatementPart =
+      CompoundStatement .
+
+
+
+   ConstantDefinition =
+      identifier '=' Constant .
+
+   TypeDefinition =
+      identifier '=' Type .
+
+   VariableDeclaration =
+      IdentifierList ':' Type .
+
+   ProcedureDeclaration =
+      ProcedureHeading ';' Block
+      | ProcedureHeading ';' Directive
+      | ProcedureIdentification ';' Block
+      .
+
+   FunctionDeclaration =
+      FunctionHeading ';' Block
+      | FunctionHeading ';' Directive
+      | FunctionIdentification ';' Block
+      .
+
+   ProcedureHeading =
+      'procedure' identifier [ FormalParameterList ] .
+
+   ProcedureIdentification =
+      'procedure' ProcedureIdentifier .
+
+   FunctionHeading =
+      'function' identifier [ FormalParameterList ] ':' ResultType .
+
+   FunctionIdentification =
+      'function' FunctionIdentifier.
+
+   FormalParameterList =
+      '(' FormalParameterSection { ';' FormalParameterSection } ')' .
+
+   FormalParameterSection =
+      ValueParameterSpecification
+      | VariableParameterSpecification
+      | ProceduralParameterSpecification
+      | FunctionalParameterSpecification
+      .
+
+/*-----------------------------------------------------------------*/
+
+   ValueParameterSpecification =
+      IdentifierList ':' ( TypeIdentifier | ConformantArraySchema ) .
+
+   VariableParameterSpecification =
+      'var' IdentifierList ':' ( TypeIdentifier | ConformantArraySchema ) .
+
+   ProceduralParameterSpecification =
+      ProcedureHeading.
+
+   FunctionalParameterSpecification =
+      FunctionHeading .
+
+   ConformantArraySchema =
+      PackedConformantArraySchema
+      | UnpackedConformantArraySchema .
+
+   PackedConformantArraySchema =
+      'packed' 'array' '[' IndexTypeSpecification ']' 'of' TypeIdentifier .
+
+   UnpackedConformantArraySchema =
+      'array' '[' IndexTypeSpecification ']' 'of'
+         ( TypeIdentifier | ConformantArraySchema ) .
+
+   IndexTypeSpecification =
+      identifier '..' identifier ':' OrdinalTypeIdentifier .
+
+/*-----------------------------------------------------------------*/
+
+   CompoundStatement =
+      'begin'
+      StatementSequence
+      'end'
+      .
+
+   StatementSequence =
+      Statement
+      { ';' Statement }
+      .
+
+   Statement =
+      [ Label ':' ] ( SimpleStatement | StructuredStatement ) .
+
+   SimpleStatement =
+      EmptyStatement
+      | AssignmentStatement
+      | ProcedureStatement
+      | GotoStatement
+      .
+
+   StructuredStatement =
+      CompoundStatement
+      | ConditionalStatement
+      | RepetitiveStatement
+      | WithStatement
+      .
+
+   ConditionalStatement =
+      IfStatement | CaseStatement .
+
+   RepetitiveStatement =
+      WhileStatement | RepeatStatement | ForStatement .
+
+   EmptyStatement = .
+
+   AssignmentStatement =
+      ( Variable | FunctionIdentifier ) ':=' Expression .
+
+   ProcedureStatement =
+      ProcedureIdentifier [ ActualParameterList | WriteParameterList ] .
+
+   GotoStatement =
+      'goto' Label .
+
+   IfStatement =
+      'if' BooleanExpression 'then' Statement
+      [ 'else' Statement ]
+      .
+
+   CaseStatement =
+      'case' CaseIndex 'of'
+         Case { ';' Case } [ ';' ]
+      'end'
+      .
+
+   RepeatStatement =
+      'repeat'
+         StatementSequence
+      'until' BooleanExpression
+      .
+
+   WhileStatement =
+      'while' BooleanExpression 'do'
+         Statement
+      .
+
+   ForStatement =
+      'for' ControlVariable ':=' InitialValue ( 'to' | 'downto' ) FinalValue 'do'
+         Statement
+      .
+
+   WithStatement =
+      'with' RecordVariableList 'do'
+         Statement
+      .
+
+   RecordVariableList =
+      RecordVariable { '.' RecordVariable } .
+
+   CaseIndex =
+      OrdinalExpression .
+
+   Case =
+      Constant { ',' Constant } ':'
+         Statement
+      .
+
+   ControlVariable =
+      VariableIdentifier .
+
+   InitialValue =
+      OrdinalExpression .
+
+   FinalValue =
+      OrdinalExpression .
+
+/*-----------------------------------------------------------------------*/
+
+   Type =
+      SimpleType | StructuredType | PointerType .
+
+   SimpleType =
+      OrdinalType | RealTypeIdentifier .
+
+   StructuredType =
+      { 'packed' } UnpackedStructuredType | StructuredTypeIdentifier .
+
+   PointerType =
+      '^' DomainType | PointerTypeIdentifier .
+
+   OrdinalType =
+      EnumeratedType | SubrangeType | OrdinalTypeIdentifier .
+
+   UnpackedStructuredType =
+      ArrayType | RecordType | SetType | FileType .
+
+   DomainType =
+      TypeIdentifier .
+
+   EnumeratedType =
+      '(' IdentifierList ')' .
+
+   SubrangeType =
+      Constant '..' Constant .
+
+   ArrayType =
+      'array' '[' IndexType { ',' IndexType } ']' 'of' ComponentType .
+
+   RecordType =
+      'record'
+         FieldList
+      'end'
+      .
+
+   SetType =
+      'set' 'of' BaseType .
+
+   FileType =
+      'file' 'of' ComponentType .
+
+   IndexType =
+      OrdinalType .
+
+   ComponentType =
+      Type.
+
+   BaseType =
+      OrdinalType .
+
+   ResultType =
+      OrdinalTypeIdentifier | RealTypeIdentifier | PointerTypeIdentifier .
+
+   FieldList =
+      [ ( FixedPart [ ':' VariantPart ] | VariantPart ) [';'] ] .
+
+   FixedPart =
+      RecordSection { ';' RecordSection } .
+
+   VariantPart =
+      'case' VariantSelector 'of'
+         Variant
+         { ';' Variant }
+      .
+
+   RecordSection =
+      IdentifierList ':' Type .
+
+   VariantSelector =
+      [ TagField ':' ] TagType .
+
+   Variant =
+      Constant { ',' Constant } ';' '(' FieldList ')' .
+
+   TagType =
+      OrdinalTypeIdentifier .
+
+   TagField =
+      identifier .
+
+/*--------------------------------------------------------------------*/
+
+   Constant =
+      [ Sign ] ( UnsignedNumber | ConstantIdentifier )
+      | characterString .
+
+/*-------------------------------------------------------------------*/
+
+   Expression =
+      SimpleExpression [ RelationOperator SimpleExpression ] .
+
+   SimpleExpression =
+      [ Sign ] Term { AddingOperator Term } .
+
+   Term =
+      Factor { MultiplyingOperator Factor } .
+
+   Factor =
+      UnsignedConstant
+      | BoundIdentifier
+      | Variable
+      | SetConstructor
+      | FunctionDesignator
+      | 'not' Factor
+      | '(' Expression ')'
+      .
+
+   RelationOperator =
+      '=' | '<>' | '<' | '<=' | '>' | '>=' | 'in' .
+
+   AddingOperator =
+      '+' | '-' | 'or' .
+
+   MultiplyingOperator =
+      '*' | '/' | 'div' | 'mod' | 'and' .
+
+   UnsignedConstant =
+      UnsignedNumber | characterString | ConstantIdentifier | 'nil' .
+
+   FunctionDesignator =
+      FunctionIdentifier [ ActualParameterList ] .
+
+   Variable =
+      EntireVariable | ComponentVariable | IdentifierVariable |
+      BufferVariable .
+
+   EntireVariable =
+      VariableIdentifier .
+
+   ComponentVariable =
+      IndexedVariable | FieldDesignator .
+
+   IdentifierVariable =
+      PointerVariable '^' .
+
+   BufferVariable =
+      FileVariable '^' .
+
+   IndexedVariable =
+      ArrayVariable '[' Index { ',' Index } ']' .
+
+   FieldDesignator =
+      [ RecordVariable '.' ] FieldIdentifier .
+
+   SetConstructor =
+      '[' [ ElementDescription { ',' ElementDescription } ] ']' .
+
+   ElementDescription =
+      OrdinalExpression [ '..' OrdinalExpression ].
+
+   ActualParameterList =
+      '(' ActualParameter { ',' ActualParameter } ')' .
+
+   ActualParameter =
+      Expression | Variable | ProcedureIdentifier | FunctionIdentifier .
+
+   WriteParameterList =
+      '(' ( FileVariable | WriteParameter ) { ',' WriteParameter } ')' .
+
+   WriteParameter =
+      Expression [ ':' IntegerExpression [ ':' IntegerExpression ] ] .
+
+   ArrayVariable =
+      Variable .
+
+   RecordVariable =
+      Variable .
+
+   FileVariable =
+      Variable .
+
+   PointerVariable =
+      Variable .
+
+   IntegerExpression =
+      OrdinalExpression .
+
+   BooleanExpression =
+      OrdinalExpression .
+
+   Index =
+      OrdinalExpression .
+
+   OrdinalExpression =
+      Expression .
+
+   PointerTypeIdentifier =
+      TypeIdentifier .
+
+   StructuredTypeIdentifier =
+      TypeIdentifier .
+
+   OrdinalTypeIdentifier =
+      TypeIdentifier .
+
+   RealTypeIdentifier =
+      TypeIdentifier .
+
+   ConstantIdentifier =
+      identifier .
+
+   TypeIdentifier =
+      identifier .
+
+   VariableIdentifier =
+      identifier .
+
+   FieldIdentifier =
+      identifier .
+
+   ProcedureIdentifier =
+      identifier .
+
+   FunctionIdentifier =
+      identifier .
+
+   BoundIdentifier =
+      identifier .
+
+   
+
+   UnsignedNumber =
+      unsignedInteger | unsignedReal .
+
+   Sign =
+      '+' | '-' .
+
+   IdentifierList =
+      identifier { ',' identifier } .
+
+   Directive =
+      identifier .
+
+   Label =
+      unsignedInteger .
+
+END Pascal . 
+

@@ -1,0 +1,139 @@
+/*
+To Do:
+   - Allow macros to be defined at the top of the build.inp file.
+   - Macros may occur in Target: needs: or todo: sections.
+   - Macros are referenced using the syntax: $(MacroName{options})
+   - In action code, the following macros are defined:
+      $(TARGET)   the current target
+      $(DEPEND)   the list of dependencies
+   - options is a comma separated list of modifiers for the macro
+     expansion.
+     Available options:
+        +.s          Add to each item in the expanded macro or list
+        .ext1=.ext2  Transforms each filename with .ext1 to .ext2
+        DIR          Transform to list of dirs.
+        EXT          Transform to list of extensions
+        FNM          Transform to list of filenames
+*/
+from pimakerlib import *
+
+      
+COMPILER pimaker
+
+   def fixLines( self, aString ):
+      # Skip blank lines
+      prevailingLine = None
+      for ln in aString.splitlines(True):
+         if len(ln.strip()) > 0:
+            prevailingLine = ln
+            break
+
+      if prevailingLine is None:
+         return ''
+
+      # Find prevailing indentation
+      for idx in xrange(0,len(prevailingLine)):
+         if not prevailingLine[idx].isspace( ):
+            break
+
+      prevailingIndentation = idx
+
+      result = [ ]
+      for ln in aString.splitlines(True):
+         if len(ln.strip()) > 0:
+            result.append( ln[prevailingIndentation:] )
+
+      return ''.join( result )
+
+CHARACTERS
+
+   letter    = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+   digit     = "0123456789".
+   cr        = '\r'.
+   lf        = '\n'.
+   tab       = '\t'.
+   printable = '\x20' .. '\x7e'.
+   stringCh  = ANY - '"' - '\\' - cr - lf.
+
+   targetChar= printable - '()[]{}<>,*?|;:\\%+=!^$&"\'` '.
+   macroChar = printable - '}' .
+
+TOKENS
+   name      = ( targetChar | '${' macroChar { macroChar } '}' )
+               { targetChar | '${' macroChar { macroChar } '}' }
+             .
+
+   string    = '"' {stringCh} '"' .
+
+COMMENTS FROM '|*' TO '*|'
+
+IGNORE cr + lf + tab
+
+PRODUCTIONS
+
+   pimaker
+      =
+      { ANY }            (. end = self.la.pos
+                            text = self.scanner.buffer.getString(0,end)
+                            bld.initializationCode( text )                .)
+      Rules
+      .
+
+   Rules
+      =
+      Rule
+      { Rule
+      }                  (. bld.finalize( )                               .)
+      .
+
+   Rule
+      =                  (. descr = None                                  .)
+      'target' ':'
+      PathList<out nameLst>
+      [
+      '('                (. beg = self.la.pos                             .)
+      {ANY}              (. end = self.la.pos
+                            descr = self.scanner.buffer.getString(beg,end).)
+      ')'
+      ]
+      'needs' ':'        (. dList = [ ] .)
+      ( PathList<out dList>
+      |                  (. dList = [ ] .)
+      )
+      'todo' ':'
+      Body<out text>     (. if descr:
+                               bld.addTarget( nameLst,descr,dList,text )
+                            else:
+                               bld.addTarget( nameLst,dList,text )        .)
+      .
+
+   PathList<out pathLst>
+      =                  (. pathLst = [ ]                                 .)
+      Path<out path>     (. pathLst.append( path )                        .)
+      { 
+      Path<out path>     (. pathLst.append( path )                        .)
+      }
+      .
+
+   Path<out path>
+      =                             (. path = ''         .)
+      PathComponent<out component>  (. path += component .)
+      { '/'                         (. path += '/'       .)
+      PathComponent<out component>  (. path += component .)
+      }
+      .
+
+   PathComponent<out component>
+      =
+      ( name | string )             (. component = self.LexString( )      .)
+      .
+
+   Body<out text>
+      =                  (. beg = self.token.pos + 1                      .)
+      { ANY }
+      '$$$'              (. end = self.token.pos
+                            text = self.scanner.buffer.getString(beg,end)
+                            text = self.fixLines( text )                  .)
+      .
+
+END pimaker.

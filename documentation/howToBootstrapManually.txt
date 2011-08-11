@@ -1,0 +1,60 @@
+Note:  This file is now superceded by pimaker.  The information in this file
+may be outdated.
+
+
+Notes:
+
+If you would like to bootstrap coco (have coco generate itself) you can
+do the following.
+
+   1.  Copy the following files into a new folder:
+            Coco app files:
+               Coco.py
+               Parser.py
+               Scanner.py
+               CharClass.py
+               CodeGenerator.py
+               Core.py
+               DriverGen.py
+               Errors.py
+               ParserGen.py
+               Trace.py
+            Target language (coco) source files:
+               Coco.atg
+               Coco.frame
+               Parser.frame
+               Scanner.frame
+        This step is precautionary so you don't accidentally overwrite
+        something.
+
+   2.   Open a command prompt and 'cd' into this new folder.
+
+   3.   type:
+
+           python coco.py -acfgijmnpsx coco.atg
+
+   4.   Asside from the .pyc files generated for each of the app files,
+        coco.py will generate the following output files:
+
+           Newly generated Coco app files:
+              Coco-test.py
+              Parser-test.py
+              Scanner-test.py
+
+           Misc. output files:
+              listing.txt
+              trace.txt
+
+   5.   Use a diff utility to compare:
+              Coco-test.py to Coco.py
+              Parser-test.py to Parser.py
+              Scanner-test.py to Scanner.py
+
+        you can also use python's diff:
+           e.g. python c:\Python25\Tools\Scripts\diff.py Coco-test.py Coco.py
+
+        In all three cases the files should be identical.
+
+   6.   It is now safe to remove the three old files and rename the
+   -test.py files.
+

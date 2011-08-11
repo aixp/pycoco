@@ -1,0 +1,173 @@
+import os
+import os.path
+import sys
+
+os.chdir( '..' )
+ROOT_DIR = os.getcwd( )
+
+sys.path.append( ROOT_DIR )
+
+RFLAGS     = '-cn'
+DFLAGS     = '-acfgijmnpsx'
+FLAGS      = DFLAGS
+SUBDIRS    = [ 'pimaker', 'examples', 'frames', 'sources', 'testSuite' ]
+GENERATED  = [ 'Coco.py', 'Parser.py', 'Scanner.py' ]
+COCO       = 'python %s/Coco.py' % ROOT_DIR
+
+
+
+target: backup (Backup all coco sources files.)
+needs:  Coco.py Parser.py Scanner.py
+todo:
+   deleteFiles( 'backup/*.py', 'backup/MANIFESST.in', 'backup/README.txt' )
+   copyFilesTo( 'backup', '*.py', 'MANIFEST.in', 'README.txt' )
+   $$$
+
+
+target: restore (Restore the backup)
+needs:  backup/Coco.py backup/Parser.py backup/Scanner.py
+todo:
+   deleteFiles( '*.py', 'MANIFEST.in', 'README.txt' )
+   copyFilesTo( '.', 'backup/*.py', 'backup/MANIFEST.in', 'backup/README.txt' )
+   $$$
+
+
+target: bootstrap (Rebuild everything.)
+needs:  sources/Coco.py sources/Parser.py sources/Scanner.py
+todo:
+   $$$
+
+
+target: sources/Coco.py sources/Parser.py sources/Scanner.py
+needs:  sources/Coco.atg
+        sources/Coco.frame sources/Parser.frame sources/Scanner.frame
+todo:
+   changeDir( '${TARGET.dir}' )
+   shell( COCO, FLAGS, 'Coco.atg' )
+   changeDir( ROOT_DIR )
+   $$$
+
+
+target: testbootstrap (Compare bootstrapped files to current Coco files.)
+needs:  sources/Coco.py sources/Parser.py sources/Scanner.py
+todo:
+   print 'Comparing newly generated coco files to existing ones.\n'
+
+   failed = False
+   for name in [ 'Coco.py', 'Parser.py', 'Scanner.py' ]:
+      print '   Checking %s...' % name
+      orig = name
+      generated = os.path.join( 'sources', name )
+      if len(compareFiles( orig, generated )) != 0:
+         print '   !!! Failed !!!'
+         failed = True
+         
+   if not failed:
+      print 'Congratulations! All generated files verified.\n'
+   $$$
+
+
+target: install (Install newly generated files.)
+needs:  sources/Coco.py sources/Parser.py sources/Scanner.py
+todo:
+   changeDir( ROOT_DIR )
+   renameFile( 'Coco.py', 'Coco-save.py' )
+   renameFile( 'Parser.py', 'Parser-save.py' )
+   renameFile( 'Scanner.py', 'Scanner-save.py' )
+   moveFilesTo( '.', 'sources/*.py' )
+   changeDir( 'sources' )
+   $$$
+
+
+target: clean (Delete all generated files.)
+needs:
+todo:
+   deleteFiles( '*.pyc', 'trace.txt', 'listing.txt' )
+
+   changeDir( 'pimaker' )
+   deleteFiles( '*.pyc', 'trace.txt', 'listing.txt' )
+   changeDir( ROOT_DIR )
+
+   for dir in [ 'sources', 'frames', 'examples', 'testSuite' ]:
+      changeDir( dir )
+      deleteFiles( '*.py', '*.pyc', 'trace.txt', 'listing.txt' )
+      changeDir( ROOT_DIR )
+   $$$
+
+
+target: purge (Delete old Coco files and local backups.)
+needs:
+todo:
+   deleteFiles( '*-save.py', '*.old', '*.*~' )
+
+   for dir in SUBDIRS:
+      changeDir( dir )
+      deleteFiles( '*-save.py', '*.old', '*.*~' )
+      changeDir( ROOT_DIR )
+   $$$
+
+target: scrub (clean and purge)
+needs:
+todo:
+   bld.build('clean')
+   bld.build('purge')
+   $$$
+
+
+target: predistribute (Try creating a distribution.)
+needs:  sources/Coco.atg
+        sources/Coco.frame sources/Parser.frame sources/Scanner.frame
+        Coco.py Parser.py Scanner.py CharClass.py
+        CodeGenerator.py Core.py DriverGen.py Errors.py
+        ParserGen.py Trace.py
+        pimaker/pimaker.py pimaker/pimakerlib.py pimaker/makepi.how
+        setup.py setupInfo.py MANIFEST.in README.txt
+todo:
+   shell( 'python setup.py sdist' )
+   $$$
+
+
+target: distribute (Create and upload the cocop distribution.)
+needs:  sources/Coco.atg
+        sources/Coco.frame sources/Parser.frame sources/Scanner.frame
+        Coco.py Parser.py Scanner.py CharClass.py
+        CodeGenerator.py Core.py DriverGen.py Errors.py
+        ParserGen.py Trace.py
+        pimaker/pimaker.py pimaker/pimakerlib.py pimaker/makepi.how
+        setup.py setupInfo.py MANIFEST.in README.txt
+todo:
+   os.environ[ 'HOME' ] = 'C:/Documents and Settings/ron'
+   shell( 'python setup.py sdist upload' )
+   $$$
+
+
+target: examples/CDECL1.py examples/CDECL2.py examples/CDECL3.py
+        examples/structs.py examples/C.py
+        examples/PASCAL.py examples/PASCAL2.py
+        examples/MOD2.py examples/PIMMOD2.py examples/OBERON.py
+        examples/ADACS.py examples/MICROADA.py
+        examples/CLANG1.py examples/CLANG2.py
+        examples/PRETTY.py examples/TASTE.py
+        examples/UMBRIEL1.py examples/UMBRIEL2.py
+        examples/EXPR.py examples/CALC.py
+needs:  ${TARGET,py=atg}
+todo:
+   changeDir( '${TARGET.dir}' )
+   shell( '@echo "" >> testlog.txt' )
+   shell( '@echo "##### TESTING ${TARGET.name} #####" >> testlog.txt' )
+   shell( COCO, '-cn ${TARGET.base}.atg >> testlog.txt')
+   shell( '@echo "----------------------------------" >> testlog.txt' )
+   shell( 'python ${TARGET.name} >> testlog.txt')
+   changeDir( ROOT_DIR )
+   $$$
+
+target: test (compile the example projects)
+needs:  examples/CDECL1.py examples/CDECL2.py examples/CDECL3.py
+        examples/CLANG1.py examples/CLANG2.py examples/TASTE.py
+        examples/MOD2.py examples/OBERON.py examples/PASCAL.py examples/PASCAL2.py
+        examples/UMBRIEL1.py examples/UMBRIEL2.py
+        examples/PIMMOD2.py examples/PRETTY.py examples/structs.py
+        examples/EXPR.py examples/C.py examples/CALC.py
+        examples/ADACS.py examples/MICROADA.py
+todo:
+   $$$
