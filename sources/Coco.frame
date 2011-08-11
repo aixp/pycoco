@@ -69,9 +69,11 @@ class Coco:
       print 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
 
       if argv is None:
-         options,args = Tab.parseArgs( sys.argv )
-      else:
-         options,args = Tab.parseArgs( argv )
+         if len(sys.argv) == 1:
+            argv = [ sys.argv[0], '-h' ]
+         else:
+            argv = sys.argv
+      options,args = Tab.parseArgs( argv )
 
       ATGName = args[1]
       dirName, fileName = os.path.split(ATGName)
