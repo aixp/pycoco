@@ -8,7 +8,7 @@ grammars is LL(k) for an arbitrary k.
 There is version of Coco/R for Python language.
 
 This is a fork of CocoPy-1.1.0rc (http://pypi.python.org/pypi/CocoPy/) of
-Ron Longo, since it unmaintained.
+Ronald Longo, since it unmaintained.
 
 
 !!!PLEASE NOTE!!!
