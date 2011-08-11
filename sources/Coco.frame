@@ -67,7 +67,7 @@ class Coco:
    @staticmethod
    def main( argv=None ):
       print 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
-      
+
       if argv is None:
          options,args = Tab.parseArgs( sys.argv )
       else:
@@ -75,7 +75,7 @@ class Coco:
 
       ATGName = args[1]
       dirName, fileName = os.path.split(ATGName)
-      
+
       # Setup the default frame directory
       try:
          if options.frameFileDir:
@@ -102,15 +102,15 @@ class Coco:
             raise RuntimeError( '-- Compiler Error: cannot close source file "%s"' % fileName )
       except IOError:
          raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % fileName )
-      
+
       scanner = Scanner( strVal )
       parser  = Parser( )
-      
+
       Errors.Init(fileName, dirName, Tab.ddt[5], parser.getParsingPos, parser.errorMessages)
       Trace.Init(dirName)
       Tab.Init()
       DFA.Init(fileName, dirName)
-      
+
       CodeGenerator.sourceDir = dirName
       CodeGenerator.frameDir  = Tab.frameDir
       ParserGen.Init(fileName, dirName)

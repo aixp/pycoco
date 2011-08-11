@@ -19,7 +19,7 @@ def expandGlob( aPathPattern ):
 def expandGlobList( paths ):
    '''Given a list of pathname patterns, return a list of all the
    paths on the local filesystem that match the patterns.
-   
+
    paths may be:
       pathname as string
       pathname pattern as string
@@ -33,7 +33,7 @@ def expandGlobList( paths ):
       return expandGlob( paths )
    elif isinstance( paths, (list,tuple) ):
       result = [ ]
-      for pattern in paths:  
+      for pattern in paths:
          result += expandGlob( pattern )
       return result
    else:
@@ -45,16 +45,16 @@ def splitStringList( aString ):
    '''
    def strip( val ):
       return val.strip( )
-   
+
    lst = aString.split( ';' )
    lst = map( strip, lst )
-   
+
    return lst
 
 def splitLists( *lists ):
    '''Given a list of things that may be a mix of globs or globlists,
    return a single python list of globs.
-   
+
    items passsed may be:
       pathname or glob as string
       a list as a string containing pathname or glob all separated by ;
@@ -68,7 +68,7 @@ def splitLists( *lists ):
       elif isinstance( lst, (list,tuple) ):
          for elt in lst:
             result += splitStringList( elt )
-   
+
    return result
 
 def renameFile( filename, filename2 ):
@@ -86,9 +86,9 @@ def makeDirs( *dirNames ):
 def moveFilesTo( destDir, *paths ):
    '''Move the files named by paths to dirname.  Overwrite existing files.'''
    paths = splitLists( *paths )
-   
+
    MakeDir( destDir )
-   
+
    for name in expandGlobList( paths ):
       base = os.path.basename( name )
       dest = os.path.join( os.path.normpath(destDir), base )
@@ -98,7 +98,7 @@ def copyFilesTo( destDir, *paths ):
    '''Copy the files named by paths to dirname.  Overwrite existing files.'''
    if not os.path.exists( destDir ):
       makeDirs( destDir )
-   
+
    paths = splitLists( *paths )
    for filename in expandGlobList( paths ):
       if os.path.isdir( filename ):
@@ -129,18 +129,18 @@ def dos2unix( filename ):
       fName = [ filename ]
    else:
       fName = filename
-   
+
    import sys
-   
+
    for fname in fName:
       infile = open( fname, "rb" )
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\r\n", "\n" ).replace( "\r", "\n" )
-  
+
       if len(outstr) == len(instr):
          continue
-      
+
       outfile = open( fname, "wb" )
       outfile.write( outstr )
       outfile.close()
@@ -150,18 +150,18 @@ def unix2dos( filename ):
       fName = [ filename ]
    else:
       fName = filename
-   
+
    import sys
-   
+
    for fname in fName:
       infile = open( fname, "rb" )
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\n", "\r\n" )
-  
+
       if len(outstr) == len(instr):
          continue
-      
+
       outfile = open( fname, "wb" )
       outfile.write( outstr )
       outfile.close()
@@ -183,34 +183,34 @@ class CocoTester( object ):
    def compileBases( self, atgFilename,isErrorBase=False ):
       '''Python replacement for compile.bat.'''
       print 'Compiling bases for test: %s' % atgFilename
-      
+
       if not atgFilename.lower().endswith( '.atg' ):
          baseName = atgFilename
          atgFilename += '.atg'
       else:
          baseName = os.path.splitext( os.path.basename( atgFilename ) )[0]
-      
+
       if not os.path.exists( atgFilename ):
          raise 'ATG file not found %s' % atgFilename
-      
+
       shell( '%s %s > %s_Output.txt' % (self._compiler, atgFilename, baseName) )
       deleteFiles( '%s_Trace.txt' % baseName, '%s_Parser.py' % baseName, '%s_Scanner.py' % baseName )
       renameFile( 'trace.txt',  '%s_Trace.txt'  % baseName )
-      
+
       if not isErrorBase:
          renameFile( 'Parser.py',  '%s_Parser.py'  % baseName )
          renameFile( 'Scanner.py', '%s_Scanner.py' % baseName )
-   
+
    def compileAllBases( self ):
       '''Python replacement for compileall.bat.'''
       for name,testType in self._suite:
          self.compileBases( name,testType )
-      
+
       print 'Done.'
 
    def check( self, name, isErrorTest=False ):
       print 'Running test: %s' % name
-      
+
       shell( '%s %s.atg >output.txt' % (self._compiler, name) )
       if compareFiles( 'trace.txt', '%s_Trace.txt' % name ):
          print 'trace files differ for %s' % name
@@ -218,7 +218,7 @@ class CocoTester( object ):
       if compareFiles( 'output.txt', '%s_Output.txt' % name ):
          print 'output files differ for %s' % name
          return False
-      
+
       if not isErrorTest:
          if compareFiles( 'Parser.py', '%s_Parser.py' % name ):
             print 'output files differ for %s' % name
@@ -226,19 +226,19 @@ class CocoTester( object ):
          if compareFiles( 'Scanner.py', '%s_Scanner.py' % name ):
             print 'output files differ for %s' % name
             return False
-      
+
       deleteFiles( '*.py.old', 'Parser.py', 'Scanner.py', 'output.txt', 'trace.txt' )
-      
+
       return True
-   
+
    def checkall( self ):
       numFailures = 0
-      
+
       for name,isErrorTest in self._suite:
          passed = self.check( name, isErrorTest )
          if not passed:
             numFailures += 1
-      
+
       print '%d tests failed.' % numFailures
       print 'Done.'
 
@@ -267,7 +267,6 @@ suite = [
       ( 'TestResIllegal',     True  ),
       ( 'TestCasing',         False )
       ]
-   
+
 tester = CocoTester( 'python ..\\coco.py', 'py', suite )
 tester.checkall( )
-

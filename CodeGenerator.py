@@ -1,7 +1,6 @@
 import os
 import os.path
 
-
 class CodeGenerator( object ):
    CR          = '\r'
    LF          = '\n'
@@ -20,7 +19,7 @@ class CodeGenerator( object ):
    def openFiles( self, frameFileName, sourceFileName, outputFileName, backup=False ):
       if isinstance(frameFileName, str):
          frameFileName = [ frameFileName ]
-      
+
       self._frameFile = None
       for frameName in frameFileName:
          fr = os.path.join( CodeGenerator.sourceDir, frameName )
@@ -32,10 +31,10 @@ class CodeGenerator( object ):
             break
          except IOError:
             pass
-      
+
       if self._frameFile is None:
          raise RuntimeError( '-- Compiler Error: Cannot open ' + frameFileName[0] )
-      
+
       try:
          fn = os.path.join( CodeGenerator.sourceDir, outputFileName )
          fn = str(fn)
@@ -50,14 +49,14 @@ class CodeGenerator( object ):
    def close( self ):
       self._frameFile.close( )
       self._outputFile.close( )
-   
+
    def CopyFramePart( self, stop ):
       assert isinstance( stop, str )
       last = 0
       startCh = stop[0]
       endOfStopString = len(stop) - 1
       ch = self.frameRead( )
-      
+
       while ch != CodeGenerator.EOF:
          if ch == startCh:
             i = 0
@@ -93,10 +92,10 @@ class CodeGenerator( object ):
             self.Indent( indent )
             self._outputFile.write( 'pass' )
          return
-      
+
       code = pos.getSubstring( )
       col = pos.col - 1
-      
+
       lines = code.splitlines( True )
       pos = 0
       if (lines is None) or (len(lines) == 0):
@@ -104,7 +103,7 @@ class CodeGenerator( object ):
             self.Indent( indent )
             self._outputFile.write( 'pass' )
          return
-      
+
       while lines[0][pos] in ( ' ', '\t' ):
          col += 1
       newLineList = [ lines[0] ]
@@ -113,21 +112,21 @@ class CodeGenerator( object ):
          col = 0
       for line in lines:
          newLineList.append( line[ col : ] )
-      
+
       for line in newLineList:
          self.Indent( indent )
          self._outputFile.write( line )
-      
+
       if indent > 0:
          self._outputFile.write( '\n' )
-      
+
       return
 
    def frameRead( self ):
       try:
          return self._frameFile.read( 1 )
       except IOError:
-         #raise RuntimeError('-- Compiler Error: error reading Parser.frame') 
+         #raise RuntimeError('-- Compiler Error: error reading Parser.frame')
          return ParserGen.EOF
 
    def Indent( self, n ):
@@ -153,7 +152,7 @@ class CodeGenerator( object ):
    def ChCond(self, ch, relOpStr='=='):
       if isinstance(ch, (str,unicode)):
          ch = ord(ch)
-      
+
       if (ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\')):
          return ''.join( [ 'ord(self.ch) ', relOpStr, " ", str(ch) ] )
       else:

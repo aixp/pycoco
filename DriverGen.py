@@ -31,7 +31,6 @@ from Errors import Errors
 from Core import Tab
 from CodeGenerator import CodeGenerator
 
-
 class DriverGen( object ):
    EOF            =  -1
    CR             =  '\r'
@@ -60,4 +59,3 @@ class DriverGen( object ):
       assert isinstance( dir, str )
       DriverGen.srcName = f
       DriverGen.srcDir  = dir
-

@@ -68,4 +68,3 @@ VersionInfo = {
       'bugfixes': [ "Coco.atg does not bootstrap on LINUX." ]
       }
    }
-

@@ -56,7 +56,7 @@ class Errors( object ):
    errDist      = minErrDist
       # A function with prototype: f( errorNum=None ) where errorNum is a
       # predefined error number.  f returns a tuple, ( line, column, message )
-      # such that line and column refer to the location in the 
+      # such that line and column refer to the location in the
       # source file most recently parsed.  message is the error
       # message corresponging to errorNum.
 
@@ -121,47 +121,47 @@ class Errors( object ):
 
    @staticmethod
    def Summarize( sourceBuffer ):
-      if Errors.mergeErrors:     
+      if Errors.mergeErrors:
          # Initialize the line iterator
          srcLineIter = iter(sourceBuffer)
          srcLineStr  = srcLineIter.next( )
          srcLineNum  = 1
-         
+
          try:
             # Initialize the error iterator
             errIter = iter(Errors.errors)
             errRec  = errIter.next( )
-            
+
             # Advance to the source line of the next error
             while srcLineNum < errRec.line:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
-               
+
                srcLineStr = srcLineIter.next( )
                srcLineNum += 1
-            
+
             # Write out all errors for the current source line
             while errRec.line == srcLineNum:
                Errors.display( srcLineStr, errRec )
-               
+
                errRec = errIter.next( )
          except:
             pass
-         
+
          # No more errors to report
          try:
             # Advance to end of source file
             while True:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
-               
+
                srcLineStr = srcLineIter.next( )
                srcLineNum += 1
          except:
             pass
-         
+
          Errors.mergedList.write( '\n' )
          Errors.mergedList.write( '%d errors detected\n' % Errors.count )
          Errors.mergedList.close( )
-      
+
       sys.stdout.write( '%d errors detected\n' % Errors.count )
       if (Errors.count > 0) and Errors.mergeErrors:
          sys.stdout.write( 'see ' + Errors.listName + '\n' )
@@ -216,7 +216,7 @@ class Parser( object ):
    def Warning( self, msg ):
       if self.errDist >= Parser.minErrDist:
          Errors.Warn( msg )
-      
+
       self.errDist = 0
 
    def Successful( self ):

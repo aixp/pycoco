@@ -27,11 +27,10 @@
 #-------------------------------------------------------------------------
 from Trace import Trace
 
-
 class CharClass( object ):
    classes = [ ]
    dummyName = ord('A')
-   
+
    charSetSize = 256     # must be a multiple of 16
 
    def __init__( self, name, s ):
@@ -80,7 +79,7 @@ class CharClass( object ):
    def WriteClasses( ):
       for c in CharClass.classes:
          Trace.Write(str(c.name), -10)
-	 Trace.Write(': ')
+         Trace.Write(': ')
          c.WriteSet( )
          Trace.WriteLine()
       Trace.WriteLine()
@@ -100,4 +99,3 @@ class CharClass( object ):
             Trace.Write(str(CharClass.Ch(j)) + ".." + str(CharClass.Ch(i-1)) + " ")
          else:
             Trace.Write(str(CharClass.Ch(j) + " "))
-

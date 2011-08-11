@@ -38,10 +38,8 @@ from Core import Symbol
 from Core import Tab
 from CodeGenerator import CodeGenerator
 
-
 class MyLoopBreak( Exception ):
    pass
-
 
 class ParserGen( object ):
    maxTerm =    3    # sets of size < maxTerm are enumerated
@@ -61,7 +59,7 @@ class ParserGen( object ):
    symSet    = [ ]
 
    codeGen   = CodeGenerator( )
-   
+
    @staticmethod
    def Overlaps( s1, s2 ):
       assert isinstance( s1, set )
@@ -96,7 +94,7 @@ class ParserGen( object ):
         # skip symSet[0] (reserved for union of SYNC sets)
         if s == ParserGen.symSet[i]: #s.equals( ParserGen.symSet[i] ):
            return i
-      ParserGen.symSet.append( copy.copy(s) ) 
+      ParserGen.symSet.append( copy.copy(s) )
       return len(ParserGen.symSet) - 1
 
    @staticmethod
@@ -227,14 +225,14 @@ class ParserGen( object ):
             ParserGen.GenCond( s1, p.sub )
             ParserGen.codeGen.write( '):\n' )
             ParserGen.GenCode( p.sub, indent+1, s1 )
-         
+
          if p.typ != Node.eps and p.typ != Node.sem and p.typ != Node.sync:
             for val in xrange( 0, len(isChecked) ):
                isChecked.discard( val )
-         
+
          if p.up:
             break
-         
+
          p = p.next
 
    @staticmethod
@@ -269,18 +267,18 @@ class ParserGen( object ):
    def GenProductions( ):
       for sym in Symbol.nonterminals:
          ParserGen.curSy = sym
-         
+
          # Generate the function header
          ParserGen.codeGen.write( '   def ' + sym.name + '( self' )
          if sym.attrPos is not None:
             ParserGen.codeGen.write( ', ' )
          ParserGen.codeGen.CopySourcePart( sym.attrPos, 0 )
          ParserGen.codeGen.write( ' ):\n' )
-         
+
          # Generate the function body
          ParserGen.codeGen.CopySourcePart( sym.semPos, 2 )
          ParserGen.GenCode( sym.graph, 2, set( ) )
-         
+
          # Generate the function close
          if sym.retVar is not None:
             ParserGen.codeGen.write( '      return ' + sym.retVar + '\n' )
@@ -319,17 +317,17 @@ class ParserGen( object ):
       assert isinstance( withNames, bool )
       assert isinstance( Tab.allSyncSets, set )
       ParserGen.symSet.append( Tab.allSyncSets )
-      
+
       ParserGen.codeGen.openFiles( 'Parser.frame', ParserGen.srcName,
             'Parser.py', True )
-      
-      if withNames: 
-         Tab.AssignNames( ) 
-      
+
+      if withNames:
+         Tab.AssignNames( )
+
       ParserGen.err = StringIO.StringIO( )
       for sym in Symbol.terminals:
          ParserGen.GenErrorMsg( ParserGen.tErr, sym )
-      
+
       ParserGen.codeGen.CopyFramePart( '-->begin' )
       if ParserGen.usingPos != None:
          ParserGen.codeGen.write( '\n' )

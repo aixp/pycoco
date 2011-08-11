@@ -28,11 +28,10 @@
 
 import os.path
 
-
 class Trace( object ):
    fileName = ''
    trace    = None
-   
+
    @staticmethod
    def Init( dir ):
       assert isinstance( dir, str )
@@ -48,7 +47,7 @@ class Trace( object ):
       the string is left-adjusted if w < 0 and right-adjusted otherwise'''
       assert isinstance( s, (str,unicode) )
       assert isinstance( w, int )
-      
+
       size = len(s)
       b = ''
       if w >= 0:
@@ -56,7 +55,7 @@ class Trace( object ):
          return b + s
       else:
          for i in xrange( w, -size ):
-            b += ' ' 
+            b += ' '
          return s + b
 
    @staticmethod
@@ -90,4 +89,3 @@ class Trace( object ):
       else:
          print
          print 'trace output is in', Trace.fileName
-

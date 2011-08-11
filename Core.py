@@ -26,7 +26,6 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 
-
 import os.path
 import sys
 import copy
@@ -35,7 +34,6 @@ from optparse import OptionParser
 from Trace import Trace
 from Errors import Errors
 from CharClass import CharClass
-
 
 class Comment( object ):
    ''' info about comment syntax'''
@@ -53,12 +51,12 @@ class Comment( object ):
 
    def Str(self, p):
       assert isinstance(p,Node)
-      s = ''    # StringBuffer 
+      s = ''    # StringBuffer
       while p is not None:
          if p.typ == Node.chr:
             s += chr(p.val)
          elif p.typ == Node.clas:
-            st = CharClass.Set(p.val)   # BitSet 
+            st = CharClass.Set(p.val)   # BitSet
             if len(st) != 1:
                Errors.SemErr("character set contains more than 1 character")
             s += chr(min(st))
@@ -70,7 +68,6 @@ class Comment( object ):
          Errors.SemErr("comment delimiters must be 1 or 2 characters long")
          s = '?'
       return s
-
 
 class Symbol( object ):
    terminals     = [ ]    # of Symbol
@@ -105,15 +102,15 @@ class Symbol( object ):
       self.retType       = ''      # AH - nt: Type of output attribute (or None)
       self.retVar        = None    # str - AH - nt: Name of output attribute (or None)
       self.symName       = None    # str,   symbolic name /* pdt */
-      
+
       if len(name) == 2 and name[0] == '"':
          Errors.SemErr( 'empty token not allowed' )
          name = '???'
-      
+
       self.typ = typ
       self.name = name
       self.line = line
-      
+
       if typ == Node.t:
          self.n = len(Symbol.terminals)
          Symbol.terminals.append( self )
@@ -126,21 +123,20 @@ class Symbol( object ):
    @staticmethod
    def Find( name ):
       assert isinstance( name, ( str, unicode ) )
-      
+
       for s in Symbol.terminals:
          if s.name == name:
             return s
-      
+
       for s in Symbol.nonterminals:
          if s.name == name:
             return s
-      
+
       return None
 
    def compareTo( self, x ):
       assert isinstance( x, Symbol )
       return self.name.__cmp__( x.name )
-
 
 class Target( object ):
    ''' set of states that are reached by an action'''
@@ -148,7 +144,6 @@ class Target( object ):
       assert isinstance( s, State )
       self.state = s      # target state
       self.next  = None   # Target instance
-
 
 class Node( object ):
    nodes = [ ]
@@ -178,7 +173,7 @@ class Node( object ):
       assert isinstance( typ, int )
       assert isinstance( symOrNodeOrInt, Symbol ) or isinstance( symOrNodeOrInt, Node ) or isinstance( symOrNodeOrInt, int ) or (symOrNodeOrInt is None)
       assert isinstance( line, int ) or (line is None)
-      
+
       self.n     =  0    # node number
       self.typ   =  0    # t, nt, wt, chr, clas, any, eps, sem, sync, alt, iter, opt, rslv
       self.next  = None  # Node,   to successor node
@@ -196,7 +191,7 @@ class Node( object ):
       self.state = None  # State,   DFA state corresponding to this node
                          #          (only used in DFA.ConvertToStates)
       self.retVar= None  # str, nt: name of output attribute (or None)
-      
+
       if isinstance(symOrNodeOrInt, int) and isinstance(line, int):
          self.typ = typ
          self.sym = None
@@ -273,7 +268,7 @@ class Node( object ):
       Trace.WriteLine("   n type name          next  down   sub   pos  line")
       Trace.WriteLine("                               val  code")
       Trace.WriteLine("----------------------------------------------------")
-      
+
       for p in Node.nodes:
          Trace.Write(str(p.n), 4)
          Trace.Write(" " + Node.nTyp[p.typ] + " ")
@@ -286,10 +281,10 @@ class Node( object ):
             Trace.Write(" ")
          else:
             Trace.Write("             ")
-         
+
          Trace.Write(str(Node.Ptr(p.next, p.up)), 5)
          Trace.Write(" ")
-         
+
          if p.typ in ( Node.t, Node.nt, Node.wt ):
             Trace.Write("             ")
             Trace.Write(Node.Pos(p.pos), 5)
@@ -312,12 +307,10 @@ class Node( object ):
             Trace.Write(Node.Pos(p.pos), 5)
          elif p.typ in ( Node.eps, Node.any, Node.sync ):
             Trace.Write("                  ")
-         
+
          Trace.WriteLine(str(p.line), 5);
-         
+
       Trace.WriteLine();
-
-
 
 class State( object ):
    ''' state of finite automaton'''
@@ -349,8 +342,8 @@ class State( object ):
 
    def DetachAction(self, act):
       assert isinstance(act,Action)
-      lasta = None   # Action 
-      a = self.firstAction   # Action 
+      lasta = None   # Action
+      a = self.firstAction   # Action
       while (a is not None) and a != act:
          lasta = a
          a = a.next
@@ -385,7 +378,6 @@ class State( object ):
          self.AddAction(a)
          action = action.next
 
-
 class Action( object ):
    ''' action of finite automaton'''
    def __init__( self, typ, sym, tc):
@@ -401,8 +393,8 @@ class Action( object ):
    def AddTarget(self,t):
       ''' add t to the action.targets'''
       assert isinstance( t, Target )
-      last = None   # Target 
-      p = self.target   # Target 
+      last = None   # Target
+      p = self.target   # Target
       while (p is not None) and (t.state.nr >= p.state.nr):
          if t.state == p.state:
             return
@@ -447,12 +439,12 @@ class Action( object ):
    def GetTargetStates(self,param):
       assert isinstance( param, list ) # Object[]
       # compute the set of target states
-      targets = set( )   # BitSet 
-      endOf = None   # Symbol 
-      ctx = False   # boolean 
+      targets = set( )   # BitSet
+      endOf = None   # Symbol
+      ctx = False   # boolean
       t = self.target
       while t is not None:
-         stateNr = t.state.nr   # int 
+         stateNr = t.state.nr   # int
          if stateNr <= DFA.lastSimState:
             targets.add(stateNr)
          else:
@@ -473,7 +465,6 @@ class Action( object ):
       param[0] = targets
       param[1] = endOf
       return ctx
-
 
 class Melted( object ):     # info about melted states
    first    = None   # Melted instance,   head of melted state list
@@ -507,13 +498,12 @@ class Melted( object ):     # info about melted states
          m = m.next
       return None
 
-
 class Graph( object ):
    dummyNode = Node( Node.eps, None, 0 )
-   
+
    def __init__( self, p=None ):
       assert isinstance(p, Node) or (p is None)
-      
+
       self.l  = p   #Node,  left end of graph = head
       self.r  = p   #Node,  right end of graph = list of nodes to be linked to successor graph
 
@@ -619,7 +609,6 @@ class Graph( object ):
       Graph.dummyNode.next = None
       return g
 
-
 class UserDefinedTokenName(object):
    NameTab = [ ]
    alias   = ''
@@ -631,7 +620,6 @@ class UserDefinedTokenName(object):
       self.alias = alias
       self.name  = name
       UserDefinedTokenName.NameTab.append(self)
-
 
 class Tab:
    semDeclPos     = None           #Position,   position of global semantic declarations
@@ -691,19 +679,19 @@ class Tab:
       optParser.add_option( '-x', '-X', dest='crossReferences',
                          action='store_true', default=False,
                          help='Include a cross reference listing in the trace file.' )
-      
+
       if argv is None:
          options, args = optParser.parse_args( )
       else:
          options, args = optParser.parse_args( argv )
-      
+
       Tab.SetDDT( options )
-      
+
       if testArgCt:
          if len(args) != 2:
             optParser.print_help( )
             sys.exit( )
-      
+
       return options,args
 
    #---------------------------------------------------------------------
@@ -917,7 +905,7 @@ class Tab:
    @staticmethod
    def CompDeletableSymbols():
       nt = Symbol.nonterminals
-      
+
       changed = False
       for sym in nt:
          if (not sym.deletable) and (sym.graph is not None) and Node.DelGraph(sym.graph):
@@ -1015,7 +1003,7 @@ class Tab:
          def __init__( self, l, r ):
             self.left  = l
             self.right = r
-      
+
       lst = [ ]
       for sym in Symbol.nonterminals:
          singles = [ ]
@@ -1023,7 +1011,7 @@ class Tab:
          for j in xrange( 0, len(singles) ):
             s = singles[j]
             lst.append( CNode(sym, s) )
-      
+
       changed = False
       i = 0
       while i < len(lst):
@@ -1040,7 +1028,7 @@ class Tab:
             i -= 1
             changed = True
          i += 1
-      
+
       while changed:
          changed = False
          i = 0
@@ -1058,7 +1046,7 @@ class Tab:
                i -= 1
                changed = True
             i += 1
-      
+
       ok = True
       for n in lst:
          ok = False;
@@ -1163,7 +1151,7 @@ class Tab:
                else:
                   soFar |= Tab.Expected(q.sub,Tab.curSy)
                Tab.CheckRes(q.sub, True)
-               
+
                q=q.down
          elif p.typ in ( Node.iter, Node.opt ):
             if p.sub.typ == Node.rslv:
@@ -1253,20 +1241,20 @@ class Tab:
       ok = True
       mark = set( )
       #a nonterminal is marked if it can be derived to terminal symbols
-      
+
       changed = False
       for sym in Symbol.nonterminals:
          if (sym.n not in mark) and Tab.IsTerm(sym.graph, mark):
             mark.add(sym.n)
             changed = True
-      
+
       while changed:
          changed = False
          for sym in Symbol.nonterminals:
             if (sym.n not in mark) and Tab.IsTerm(sym.graph, mark):
                mark.add(sym.n)
                changed = True
-      
+
       for sym in Symbol.nonterminals:
          if sym.n not in mark:
             ok = False
@@ -1288,9 +1276,9 @@ class Tab:
    @staticmethod
    def PrintSet( aSet, indent ):
       assert isinstance( indent, int )
-      
+
       col = indent
-      
+
       for sym in Symbol.terminals:
          if sym.n in aSet:
             ln = len(sym.name)
@@ -1363,7 +1351,7 @@ class Tab:
             lst = [ ]
             tab[sym] = lst
          lst.append( -sym.line )
-      
+
       # collect lines where symbols have been referenced
       for n in Node.nodes:
          if n.typ in (Node.t, Node.wt, Node.nt):
@@ -1373,7 +1361,7 @@ class Tab:
                lst = [ ]
                tab[n.sym] = lst
             lst.append(n.line)
-      
+
       # print cross reference list
       Trace.WriteLine("Cross reference list:")
       Trace.WriteLine("--------------------")
@@ -1385,7 +1373,7 @@ class Tab:
             if k.name == key:
                sym = k
                break
-         
+
          Trace.Write("  ")
          Trace.Write(Node.Name(sym.name), -12)
          lst = tab[sym]
@@ -1549,7 +1537,6 @@ class Tab:
       Symbol.terminals[ len(Symbol.terminals)-1 ].symName = 'NOT_SYM'
       sys.stdout.write( " (Names assigned)" )
 
-
 class DFA( object ):
    maxStates = 0
    EOF = -1
@@ -1611,7 +1598,7 @@ class DFA( object ):
          return ''.join( [ 'ord(self.ch) ', relOpStr, " ", str(ch) ] )
       else:
          return ''.join( [ 'self.ch ', relOpStr, " '", chr(ch), "'" ] )
-      
+
    @staticmethod
    def PutRange(s):
       assert isinstance(s, set)
@@ -1640,7 +1627,7 @@ class DFA( object ):
          DFA.gen.write(" and Scanner.ch != Scanner.buffer.EOF")
       else:
          DFA.gen.write("(")
-         
+
          for i in xrange( 0, top+1 ):
             if hi[i] == lo[i]:
                DFA.gen.write( DFA.ChCond( lo[i] ) )
@@ -1658,9 +1645,9 @@ class DFA( object ):
    @staticmethod
    def Hex2Char(s):
       assert isinstance( s, (str,unicode) )
-      val = 0   # int 
+      val = 0   # int
       for i in xrange(0,len(s)):
-         ch = s[i]               # char 
+         ch = s[i]               # char
          if '0' <= ch <= '9':
             val = 16 * val + (ord(ch) - ord('0'))
          elif 'a' <= ch <= 'f':
@@ -1738,7 +1725,7 @@ class DFA( object ):
 #---------- State handling
    @staticmethod
    def NewState():
-      s = State()   # State 
+      s = State()   # State
       if DFA.firstState is None:
          DFA.firstState = s
       else:
@@ -1928,7 +1915,7 @@ class DFA( object ):
          Errors.SemErr("token might be empty")
       DFA.NumberNodes(DFA.curGraph, DFA.firstState)
       DFA.FindTrans(DFA.curGraph, True, set( ))
-  
+
    @staticmethod
    def MatchLiteral(s, sym):
       assert isinstance(sym,Symbol)
@@ -1937,7 +1924,7 @@ class DFA( object ):
       fixedToken or as a litToken'''
       s = DFA.Unescape(s[1:-1])
       ln = len(s)
-      state = DFA.firstState   # State 
+      state = DFA.firstState   # State
       a = None
       endedPrematurely = False
       for i in xrange(0, ln):    # try to match s against existing DFA
@@ -1955,11 +1942,11 @@ class DFA( object ):
          a = None
          DFA.dirtyDFA = True
       while i < ln:      # make new DFA for s[i..len-1]
-         to = DFA.NewState()   # State 
+         to = DFA.NewState()   # State
          DFA.NewTransition(state, to, Node.chr, s[i], Node.normalTrans)
          state = to
          i += 1
-      matchedSym = state.endOf   # Symbol 
+      matchedSym = state.endOf   # Symbol
       if state.endOf is None:
          state.endOf = sym
       elif (matchedSym.tokenKind == Symbol.fixedToken) or (a is not None) and (a.tc == Node.contextTrans):
@@ -2026,7 +2013,7 @@ class DFA( object ):
    def MakeUnique( state):
       assert isinstance(state,State)
       # return True if actions were split
-      changed = False   # boolean 
+      changed = False   # boolean
       a = state.firstAction
       while a is not None:
          b = a.next
@@ -2048,7 +2035,7 @@ class DFA( object ):
             ctx = action.GetTargetStates(param)
             targets = param[0]
             endOf = param[1]
-            melt = Melted.StateWithSet(targets)   # Melted 
+            melt = Melted.StateWithSet(targets)   # Melted
             if melt is None:
                s = DFA.NewState()
                s.endOf = endOf
@@ -2087,7 +2074,7 @@ class DFA( object ):
          while changed:
             changed = DFA.MakeUnique(state)
          state = state.next
-     
+
       state = DFA.firstState
       while state is not None:
          DFA.MeltStates(state)
@@ -2104,7 +2091,7 @@ class DFA( object ):
       Trace.WriteLine("---------- states ----------")
       state = DFA.firstState
       while state is not None:
-         first = True   # boolean 
+         first = True   # boolean
          if state.endOf is None:
             Trace.Write("               ")
          else:
@@ -2238,11 +2225,11 @@ class DFA( object ):
    @staticmethod
    def CopyFramePart(stop):
       assert isinstance(stop,(str,unicode))
-      last = 0;   # int 
+      last = 0;   # int
       startCh = stop[0]
       endOfStopString = len(stop) - 1
-      ch = DFA.framRead()   # int 
-      
+      ch = DFA.framRead()   # int
+
       while ch != DFA.EOF:
          if ch == startCh:
             i = 0
@@ -2291,10 +2278,10 @@ class DFA( object ):
       if (DFA.ignoreCase):
          DFA.gen.write(".lower()")
       DFA.gen.write( '\n' )
-      first = True   # boolean 
+      first = True   # boolean
       for sym in Symbol.terminals:
          if (sym.tokenKind == Symbol.litToken):
-            name = DFA.SymName(sym)   # String 
+            name = DFA.SymName(sym)   # String
             if DFA.ignoreCase:
                name = name.lower()
             # sym.name stores literals with quotes, e.g. "\"Literal\"",
@@ -2311,9 +2298,9 @@ class DFA( object ):
    @staticmethod
    def WriteState( state):
       assert isinstance(state,State)
-      endOf = state.endOf   # Symbol 
+      endOf = state.endOf   # Symbol
       DFA.gen.write(str(state.nr) + ":\n")
-      ctxEnd = state.ctx    # boolean 
+      ctxEnd = state.ctx    # boolean
       action = state.firstAction
       while action is not None:
          if action == state.firstAction:
@@ -2380,11 +2367,11 @@ class DFA( object ):
       assert isinstance( startTab, list )
       action = DFA.firstState.firstAction
       while action is not None:
-         targetState = action.target.state.nr;   # int 
+         targetState = action.target.state.nr;   # int
          if action.typ == Node.chr:
             startTab[action.sym] = targetState
          else:
-            s = CharClass.Set(action.sym)   # BitSet 
+            s = CharClass.Set(action.sym)   # BitSet
             for i in xrange( 0, CharClass.charSetSize ):
                if i in s:
                   startTab[i] = targetState
@@ -2394,7 +2381,7 @@ class DFA( object ):
    def OpenGen(backUp):
       assert isinstance(backUp,bool)
       try:
-         fn = DFA.srcDir + "Scanner.py"   # String 
+         fn = DFA.srcDir + "Scanner.py"   # String
          if backUp and os.path.exists(fn):
             if os.path.exists(fn + '.old'):
                os.remove( fn + '.old' )
@@ -2407,7 +2394,7 @@ class DFA( object ):
    def WriteScanner( withNames):
       assert isinstance(withNames,bool)
       startTab = [ 0 for i in xrange(CharClass.charSetSize) ]
-      fr = DFA.srcDir + "Scanner.frame"   # String 
+      fr = DFA.srcDir + "Scanner.frame"   # String
       if not os.path.exists( fr ):
          if Tab.frameDir is not None:
             fr = os.path.join( Tab.frameDir.strip(), "Scanner.frame" )
@@ -2425,7 +2412,7 @@ class DFA( object ):
       if not DFA.srcName.lower( ).endswith( 'coco.atg' ):
          DFA.gen.close()
          DFA.OpenGen(False)
-      
+
       DFA.CopyFramePart("-->declarations")
       DFA.gen.write("   charSetSize = " + str(CharClass.charSetSize) + '\n')
       DFA.gen.write("   maxT = "        + str(len(Symbol.terminals) - 1) + '\n')
@@ -2446,29 +2433,29 @@ class DFA( object ):
             DFA.gen.write(",")
          DFA.gen.write( '\n' )
       DFA.gen.write("     -1]\n")
-      
+
       if DFA.ignoreCase:
          DFA.gen.write("   valCh = u''       # current input character (for token.val)")
-      
+
       DFA.CopyFramePart("-->initialization")
       j = 0
       for i in Tab.ignored:
          DFA.gen.write("      self.ignore.add(" + str(i) + ") \n")
-      
+
       DFA.CopyFramePart("-->casing")
       if DFA.ignoreCase:
          DFA.gen.write("      valCh = self.ch\n")
          DFA.gen.write("      if self.ch != Buffer.EOF:\n")
          DFA.gen.write("         self.ch = self.ch.lower()\n");
-     
+
       DFA.CopyFramePart("-->comments")
-      com = Comment.first   # Comment 
+      com = Comment.first   # Comment
       i = 0
       while com is not None:
          DFA.GenComment(com, i)
          com = com.next
          i += 1
-      
+
       DFA.CopyFramePart("-->literals")
       DFA.GenLiterals()
 
@@ -2489,7 +2476,7 @@ class DFA( object ):
       if DFA.hasCtxMoves:
          DFA.gen.write('\n')
          DFA.gen.write("      apx = 0")
-      
+
       DFA.CopyFramePart("-->scan2")
       if DFA.ignoreCase:
          DFA.gen.write("buf += unicode(self.ch)\n")
@@ -2497,7 +2484,7 @@ class DFA( object ):
       else:
          DFA.gen.write("buf += unicode(self.ch)\n")
          DFA.gen.write("      self.NextCh()\n")
-      
+
       DFA.CopyFramePart("-->scan3")
       state = DFA.firstState.next
       while state is not None:
@@ -2531,4 +2518,3 @@ class DFA( object ):
       else:
          DFA.gen.write("Scanner.")
          DFA.gen.write(str(sym.symName))
- 

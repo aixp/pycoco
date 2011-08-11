@@ -44,7 +44,7 @@ class Position( object ):    # position of source code stretch (e.g. semantic ac
       assert isinstance( beg, int )
       assert isinstance( len, int )
       assert isinstance( col, int )
-      
+
       self.buf = buf
       self.beg = beg   # start relative to the beginning of the file
       self.len = len   # length of stretch
@@ -192,7 +192,7 @@ class Scanner(object):
 
    def __init__( self, s ):
       self.buffer = Buffer( unicode(s) ) # the buffer instance
-      
+
       self.ch        = u'\0'       # current input character
       self.pos       = -1          # column number of current character
       self.line      = 1           # line number of current character
