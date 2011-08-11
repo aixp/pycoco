@@ -85,15 +85,21 @@ class CharClass( object ):
       Trace.WriteLine()
 
    def WriteSet( self ):
+      s = self.set.copy()
+      try:
+         s.remove('ANYCHAR')
+      except KeyError:
+         pass
+
       i = 0
-      mx = max(self.set) + 1
+      mx = max(s) + 1
       while i < mx:
-         while i < mx and (i not in self.set):
+         while i < mx and (i not in s):
             i += 1
          if i == mx:
             break
          j = i
-         while i < mx and (i in self.set):
+         while i < mx and (i in s):
             i += 1
          if j < (i - 1):
             Trace.Write(str(CharClass.Ch(j)) + ".." + str(CharClass.Ch(i-1)) + " ")

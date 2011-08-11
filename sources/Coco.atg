@@ -245,7 +245,8 @@ SimSet<out s>                   (. n1 = 0
 
 | "ANY"                         (. s = set( )
                                    for num in xrange( 0, CharClass.charSetSize ):
-                                      s.add(num)              .)
+                                      s.add(num)
+                                   s.add('ANYCHAR')              .)
 )
 .
 

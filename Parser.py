@@ -710,7 +710,8 @@ class Parser( object ):
          self.Get( )
          s = set( )
          for num in xrange( 0, CharClass.charSetSize ):
-            s.add(num)              
+            s.add(num)
+         s.add('ANYCHAR')              
       else:
          self.SynErr(65)
       return s

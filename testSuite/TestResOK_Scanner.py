@@ -37,7 +37,7 @@ class Buffer( object ):
 
    def Read( self ):
       if self.pos < self.bufLen:
-         result = unichr(ord(self.buf[self.pos]) & 0xff)   # mask out sign bits
+         result = self.buf[self.pos]
          self.pos += 1
          return result
       else:
@@ -50,7 +50,7 @@ class Buffer( object ):
 
    def Peek( self ):
       if self.pos < self.bufLen:
-         return unichr(ord(self.buf[self.pos]) & 0xff)    # mask out sign bits
+         return self.buf[self.pos]
       else:
          return Scanner.buffer.EOF
 
@@ -168,7 +168,10 @@ class Scanner(object):
       self.t.pos = self.pos
       self.t.col = self.pos - self.lineStart + 1
       self.t.line = self.line
-      state = self.start[ord(self.ch)]
+      if ord(self.ch) < len(self.start):
+         state = self.start[ord(self.ch)]
+      else:
+         state = 0
       buf = u''
       buf += unicode(self.ch)
       self.NextCh()

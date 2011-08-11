@@ -1639,6 +1639,8 @@ class DFA( object ):
             if i < top:
                DFA.gen.write('\n')
                DFA.gen.write("                 or ")
+         if 'ANYCHAR' in s:
+            DFA.gen.write(' or ord(self.ch) > %d' % CharClass.charSetSize)
          DFA.gen.write(")")
 
         #---------- String handling
