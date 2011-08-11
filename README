@@ -1,3 +1,16 @@
+Coco/R (http://ssw.jku.at/coco/) is a compiler generator, which takes an
+attributed grammar of a source language and generates a scanner and a parser
+for this language. The scanner works as a deterministic finite automaton.
+The parser uses recursive descent. LL(1) conflicts can be resolved by a
+multi-symbol lookahead or by semantic checks. Thus the class of accepted
+grammars is LL(k) for an arbitrary k.
+
+There is version of Coco/R for Python language.
+
+This is a fork of CocoPy-1.1.0rc (http://pypi.python.org/pypi/CocoPy/ of
+Ron Longo, since it unmaintained.
+
+
 !!!PLEASE NOTE!!!
 This distribution is a release candidate.
 
@@ -7,7 +20,6 @@ use Coco for Python.
 
 This file contains a list of the contents of the distribution and a
 development roadmap.
-
 
 CONTENTS OF THIS DISTRIBUTION
 
@@ -36,7 +48,7 @@ This distribution of Coco includes the following:
       README.txt         - this file.
 
    /documentation
-      
+
       license.txt        - The license agreement
       CocoDoc.htm        - The documentation for CocoPy
       howToBootstrap.txt - Instructions on how to bootstrap Coco (outdated)
@@ -77,12 +89,12 @@ This distribution of Coco includes the following:
       coco.py, Parser.py and Scanner.py.  If there are no differences,
       the test passes.  However, when modifications are made to Coco.py
       this sort of testing is not sufficient.
-      
+
       The suite of tests is in this directory are ported for the C#
       implementation of Coco/R.  They test Coco/R features.  To run the
       test suite open a command shell into the testSuite folder and execute
       the following:
-      
+
          >>> python cocopTester.py
 
 
@@ -123,4 +135,3 @@ Release#   Goal
 
 As I move Coco towards a final release I also want to continuously update
 and refine the documentation.
-
