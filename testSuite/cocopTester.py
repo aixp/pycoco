@@ -268,5 +268,5 @@ suite = [
       ( 'TestCasing',         False )
       ]
 
-tester = CocoTester( 'python ..\\coco.py', 'py', suite )
+tester = CocoTester( 'python %s' % (os.path.join('..', 'Coco.py')), 'py', suite )
 tester.checkall( )
