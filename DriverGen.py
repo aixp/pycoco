@@ -52,6 +52,7 @@ class DriverGen( object ):
       #DriverGen.codeGen.write( Tab.gramSy.name )
       DriverGen.codeGen.CopyFramePart( '$$$' )
       DriverGen.codeGen.close( )
+      os.chmod(fn, 0755)
 
    @staticmethod
    def Init( f, dir ):

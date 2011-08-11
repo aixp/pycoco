@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 #/*-------------------------------------------------------------------------
 #Coco.py -- the Compiler Driver
 #Compiler Generator Coco/R,
