@@ -478,4 +478,4 @@ PRODUCTIONS
    Label =
       unsignedInteger .
 
-END Pascal .
+END Pascal.
