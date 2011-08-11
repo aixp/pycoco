@@ -13,7 +13,7 @@ Pimaker is written in Coco as a practical example of a Coco application.
 
 To setup pimaker it must furst be compiled by coco as follows:
 
-      > python ../coco.py -c pimaker.atg
+      > python ../Coco.py -c pimaker.atg
 
 This will generate pimaker.py, Pimaker's main module.
 

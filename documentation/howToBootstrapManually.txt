@@ -31,10 +31,10 @@ do the following.
 
    3.   type:
 
-           python coco.py -acfgijmnpsx coco.atg
+           python Coco.py -acfgijmnpsx Coco.atg
 
    4.   Asside from the .pyc files generated for each of the app files,
-        coco.py will generate the following output files:
+        Coco.py will generate the following output files:
 
            Newly generated Coco app files:
               Coco-test.py
@@ -57,4 +57,3 @@ do the following.
 
    6.   It is now safe to remove the three old files and rename the
    -test.py files.
-
