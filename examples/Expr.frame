@@ -46,20 +46,20 @@ Errors.Init( 'interactive', '', False, parser.getParsingPos, parser.errorMessage
 while True :
     try :
         strVal = raw_input( "Expr>" )
-    
+
     except EOFError :
         break;
-    
+
     if len(strVal) == 0 :
         break;
-    
+
     scanner = Scanner( strVal )
     parser.Parse( scanner )
 
     if Errors.count > 0 :
         Errors.Summarize( scanner.buffer )
         Errors.count = 0;
-    
+
 sys.exit( 0 )
 
 $$$

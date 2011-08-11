@@ -6,7 +6,3 @@ VAR
   WRITE A;
   B := A*16;
   WRITE B*2
-
-
-
-

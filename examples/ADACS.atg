@@ -82,12 +82,12 @@ PRODUCTIONS
   ExcPart          = "EXCEPTION" {ExcHandler}.
   ExcHandler       = "WHEN" ExcWhenTail.
   ExcWhenTail      = "OTHERS" "=>" StatList | Name { "|" Name } "=>" StatList.
-  Stat             =   Pragma | NullStat | AssignStat | CallStat | Block | LoopStat 
+  Stat             =   Pragma | NullStat | AssignStat | CallStat | Block | LoopStat
                      | IfStat | ExitStat | ReturnStat | CaseStat | RaiseStat.
   StatList         = Stat {Stat}.
   NullStat         = "NULL" ";".
   AssignStat       = Name ":=" Expr ";".
-  CallStat         = Name ";".   
+  CallStat         = Name ";".
   Block            = [id ":"] [DeclPart] "BEGIN" {Stat} [ExcPart] "END" [ id] ";".
   DeclPart         = "DECLARE" BodyDecl.
   ReturnStat       = "RETURN" [Expr] ";".
@@ -116,7 +116,7 @@ PRODUCTIONS
   AddOp            = "+" | "-" | "&".
   UnaryAddOp       = "+" | "-".
   MulOp            = "*" | "/" | "MOD".
-  Name             = SimpleName {NameSuffix} ["." "ALL"].    
+  Name             = SimpleName {NameSuffix} ["." "ALL"].
   SimpleName       = id.
   NameSuffix       = "." SelSuffix | "(" Expr {"," Expr}")" | "'" id.
   SelSuffix        = id | OpSymbol.
@@ -126,7 +126,3 @@ PRODUCTIONS
   AggChoice        = SimpleName | SimpleExpr | DiscrRange | "OTHERS".
   NameList         = Name { "," Name } .
 END AdaCS.
-
-
-
-

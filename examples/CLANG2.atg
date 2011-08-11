@@ -293,7 +293,3 @@ PRODUCTIONS
    | ">="                            (. Append(" >= ") .) .
 
 END Clang2.
-
-
-
-

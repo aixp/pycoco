@@ -23,7 +23,7 @@ PRODUCTIONS
   IdList      =  id {"," id}.
   Type        =  "ARRAY" "(" Range ")" "OF" SimpleType.
   SimpleType  =  "INTEGER" | "CHARACTER" | "BOOLEAN".
-  ProcDecl    =  "PROCEDURE" id FormalPart 
+  ProcDecl    =  "PROCEDURE" id FormalPart
                  ["IS" {Declaration} "BEGIN" {Stat} "END" [id]] ";".
   FormalPart  =  ["(" ParamDecl {";" ParamDecl} ")"].
   ParamDecl   =  IdList ":" [ParamMode] ["ARRAY" "OF"] SimpleType.
@@ -56,4 +56,3 @@ PRODUCTIONS
   MulOp       =  "*" | "/" | "MOD".
 
 END MAda.
-

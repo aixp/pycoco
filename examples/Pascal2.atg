@@ -461,7 +461,7 @@ PRODUCTIONS
    BoundIdentifier =
       identifier .
 
-   
+
 
    UnsignedNumber =
       unsignedInteger | unsignedReal .
@@ -478,5 +478,4 @@ PRODUCTIONS
    Label =
       unsignedInteger .
 
-END Pascal . 
-
+END Pascal .

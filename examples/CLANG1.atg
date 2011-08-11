@@ -1,6 +1,6 @@
 COMPILER Clang1
 /* Simple CLANG level 1 parser.
-   See "Programming Language Translation" by P.D. Terry (Addison Wesley 1986) 
+   See "Programming Language Translation" by P.D. Terry (Addison Wesley 1986)
    Adapted from Pat Terry's distribution
 */
 
@@ -41,26 +41,26 @@ PRODUCTIONS
    Statement          =  SYNC [  CompoundStatement | Assignment
                                | IfStatement | WhileStatement
                                | WriteStatement | ReadStatement ] .
-                       
+
    Assignment         =  VarDesignator ":=" Expression .
-                          
+
    IfStatement        =  "IF" Condition "THEN" Statement .
 
    WhileStatement     =  "WHILE" Condition "DO" Statement .
-                          
+
    WriteStatement     =  "WRITE" [ "(" WriteList ")" ] .
-                          
+
    ReadStatement      =  "READ" "(" VarDesignator { "," VarDesignator } ")" .
 
    Condition          =    "ODD" "(" Expression ")"
                          | Expression RelOp Expression SYNC .
 
    WriteList          =  ( Expression | string ) { "," ( Expression | string ) }.
-                          
+
    Expression         =  SYNC ( Term | "+" Term | "-" Term) { AddOp Term } .
-                          
+
    Term               =  Factor { MulOp Factor } .
-                          
+
    Factor             =  SYNC (identifier | number | "(" Expression ")" ) .
 
    VarDesignator      =  VarIdentifier .
@@ -78,7 +78,3 @@ PRODUCTIONS
    ConstIdentifier    =  identifier .
 
 END Clang1.
-
-
-
-

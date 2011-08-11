@@ -8,7 +8,7 @@ COMPILER Expr
 
    def getNumber( self ):
       return int( self.token.val )
-    
+
    def getVar( self ):
       return self.token.val
 
@@ -62,7 +62,7 @@ PRODUCTIONS
       .
 
    Number<out result>
-   =                          
+   =
    number                     (. result = self.getNumber() .)
    .
 

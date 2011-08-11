@@ -23,7 +23,7 @@ def expandGlob( aPathPattern ):
 def expandGlobList( paths ):
    '''Given a list of pathname patterns, return a list of all the
    paths on the local filesystem that match the patterns.
-   
+
    paths may be:
       pathname as string
       pathname pattern as string
@@ -37,7 +37,7 @@ def expandGlobList( paths ):
       return expandGlob( paths )
    elif isinstance( paths, (list,tuple) ):
       result = [ ]
-      for pattern in paths:  
+      for pattern in paths:
          result += expandGlob( pattern )
       return result
    else:
@@ -49,16 +49,16 @@ def splitStringList( aString ):
    '''
    def strip( val ):
       return val.strip( )
-   
+
    lst = aString.split( ';' )
    lst = map( strip, lst )
-   
+
    return lst
 
 def splitLists( *lists ):
    '''Given a list of things that may be a mix of globs or globlists,
    return a single python list of globs.
-   
+
    items passsed may be:
       pathname or glob as string
       a list as a string containing pathname or glob all separated by ;
@@ -72,7 +72,7 @@ def splitLists( *lists ):
       elif isinstance( lst, (list,tuple) ):
          for elt in lst:
             result += splitStringList( elt )
-   
+
    return result
 
 def renameFile( filename, filename2 ):
@@ -90,9 +90,9 @@ def makeDirs( *dirNames ):
 def moveFilesTo( destDir, *paths ):
    '''Move the files named by paths to dirname.  Overwrite existing files.'''
    paths = splitLists( *paths )
-   
+
    MakeDir( destDir )
-   
+
    for name in expandGlobList( paths ):
       base = os.path.basename( name )
       dest = os.path.join( os.path.normpath(destDir), base )
@@ -102,7 +102,7 @@ def copyFilesTo( destDir, *paths ):
    '''Copy the files named by paths to dirname.  Overwrite existing files.'''
    if not os.path.exists( destDir ):
       makeDirs( destDir )
-   
+
    paths = splitLists( *paths )
    for filename in expandGlobList( paths ):
       if os.path.isdir( filename ):
@@ -133,18 +133,18 @@ def dos2unix( filename ):
       fName = [ filename ]
    else:
       fName = filename
-   
+
    import sys
-   
+
    for fname in fName:
       infile = open( fname, "rb" )
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\r\n", "\n" ).replace( "\r", "\n" )
-  
+
       if len(outstr) == len(instr):
          continue
-      
+
       outfile = open( fname, "wb" )
       outfile.write( outstr )
       outfile.close()
@@ -154,18 +154,18 @@ def unix2dos( filename ):
       fName = [ filename ]
    else:
       fName = filename
-   
+
    import sys
-   
+
    for fname in fName:
       infile = open( fname, "rb" )
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\n", "\r\n" )
-  
+
       if len(outstr) == len(instr):
          continue
-      
+
       outfile = open( fname, "wb" )
       outfile.write( outstr )
       outfile.close()
@@ -180,20 +180,20 @@ def shell( *strings ):
 class Rule( object ):
    def __init__( self, target, dependancies, action, description=None ):
       global TARGET, NEEDS
-      
+
       self._target       = target
       self._description  = description
       self._dependancies = { }           # dependency to rule
       self._action       = None
-      
+
       TARGET = self._target
       NEEDS  = [ ]
       for dependancy in dependancies:
          NEEDS.append( self.expandMacros(dependancy) )
-      
+
       for dependancy in NEEDS:
          self._dependancies[ dependancy ] = None
-      
+
       self._action = self.expandMacros( action )
 
    def getDependancies( self ):
@@ -201,19 +201,19 @@ class Rule( object ):
 
    def getDescription( self ):
       return self._description
-   
+
    def defineDependencyRule( self, dependencyName, Rule ):
       self._dependancies[ dependencyName ] = Rule
-   
+
    def build( self ):
       target = os.path.normpath( self._target )
-      
+
       # Handle subrules
       if len( self._dependancies ) == 0:
          needToRebuildTarget = True
       else:
          needToRebuildTarget = not os.path.exists( target )
-      
+
       for dependency, subrule in self._dependancies.iteritems( ):
          dependency = os.path.normpath( dependency )
          if not os.path.exists( dependency ):
@@ -222,33 +222,33 @@ class Rule( object ):
                print '-----------------------------------'
             else:
                raise Exception( 'No rule to build target %s' % dependency )
-         
+
          if os.path.exists( target ):
             targetTime     = os.stat( target )[ 8 ]
             dependencyTime = os.stat( dependency )[ 8 ]
-            
+
             if dependencyTime > targetTime:
                needToRebuildTarget = True
-      
+
       if needToRebuildTarget:
          print 'Building: %s' % target
          execActionCode( self._action )
-   
+
    def expandMacros( self, aString ):
       macroStart = aString.find( '${' )
-      
+
       while macroStart != -1:
          macroEnd   = aString.find( '}', macroStart+2 )
          macroSeq   = aString[ macroStart+2 : macroEnd ].split( ',' )
-         
+
          if '.' in macroSeq[0]:
             var,op = macroSeq[0].split('.')
          else:
             var = macroSeq[0]
             op  = None
-         
+
          value = globals( )[ var ]
-         
+
          if isinstance( value, (str,unicode) ):
             if op == 'dir':
                value = os.path.dirname( value )
@@ -258,7 +258,7 @@ class Rule( object ):
                value = os.path.splitext( os.path.basename( value ) )[0]
             elif op == 'ext':
                value = os.path.splitext( os.path.basename( value ) )[1]
-            
+
             if len(macroSeq) > 1:
                mark = macroSeq[1].find( '=' )
                if mark == -1:
@@ -266,15 +266,15 @@ class Rule( object ):
                old = macroSeq[1][ : mark  ]
                new = macroSeq[1][ mark+1 : ]
                value = value.replace( old, new )
-            
+
             aString = aString[ :macroStart ] + value + aString[ macroEnd+1: ]
             macroStart = aString.find( '${' )
          elif isinstance( value, (list,tuple) ):
             pass
-      
+
       return aString
-   
-   
+
+
 class Builder( object ):
    def __init__( self, projectName='' ):
       self._rules           = { }
@@ -286,17 +286,17 @@ class Builder( object ):
    @staticmethod
    def set( name, value ):
       set( name, value )
-   
+
    @staticmethod
    def unset( name ):
       unset( name )
-   
+
    def addTarget( self, targets, *args ):
       if isinstance( targets, str ):
          targets = [ targets ]
-      
+
       numArgs = len( args )
-      
+
       if numArgs == 3:
          # We have a description
          description  = args[0]
@@ -309,10 +309,10 @@ class Builder( object ):
          actions      = args[1]
       else:
          raise TypeError( 'addTarget() takes 3 or 4 arguments (%d given)' % numArgs )
-      
+
       for target in targets:
          depend = [ ]
-         
+
          self._rules[ target ] = Rule( target, dependencies, actions, description )
          self._menuOrder.append( target )
 
@@ -325,28 +325,28 @@ class Builder( object ):
             else:
                if dependencyName not in self._leaves:
                   self._leaves.append( dependencyName )
-      
+
       # Determine the top-level targets
       targets = self._rules.keys( )
-      
+
       for name in self._rules.keys( ):
          for rule in self._rules.values( ):
             if name in rule.getDependancies( ):
                if name in targets:
                   targets.remove( name )
-      
+
       targets.sort()
       self._topLevelTargets = [ ]
       for targetName in self._menuOrder:
          if targetName in targets:
             self._topLevelTargets.append( ( targetName, self._rules[ targetName ].getDescription() ) )
-   
+
    def targets( self ):
       return self._rules.keys( )
 
    def build( self, target ):
       print '********** Target: %s' % target
-      
+
       try:
          theRule = self._rules[ target ]
          theRule.build( )
@@ -358,22 +358,22 @@ class Builder( object ):
 
    def topTargets( self ):
       return self._topLevelTargets
-   
+
    def allTargets( self ):
       return self._rules.keys( )
-   
+
    def initializationCode( self, code ):
       execActionCode( code )
 
    def goInteractive( self ):
       print
       print 'Entering Interactive Builder'
-      
+
       response = ''
       self._buildMenu( )
       while response != 'exit':
          target = raw_input( '\nbuild> ' )
-         
+
          if target == 'showall':
             targetList = self.allTargets( )
             targetList.sort( )
@@ -387,7 +387,7 @@ class Builder( object ):
             self.build( target )
          else:
             print '   !!! Unknown Target !!!'
-         
+
          self._buildMenu( )
 
    def _buildMenu( self ):
@@ -395,12 +395,12 @@ class Builder( object ):
       print 'Targets:'
       for targetName, targetDescription in self._topLevelTargets:
          print '   %-15s  %s' % ( targetName, targetDescription )
-      
+
       print
       print '   %-15s  %s' % ( 'showall', 'Show the full list of targets.' )
       print '   %-15s  %s' % ( 'exit', 'Exit the interactive builder.' )
-   
-   
+
+
 bld = Builder( )
 
 def execActionCode( code ):
@@ -413,7 +413,7 @@ class Path( object ):
       self._dir       = [ ]
       self._fileName  = ''
       self._extension = ''
-      
+
       self._drive, self._dir, self._fileName, self._extension = FilePath.parseSystemDependantPath( path )
 
    @staticmethod
@@ -422,86 +422,86 @@ class Path( object ):
       dir, fName          = os.path.split( fullPath )
       fileName, extension = os.path.splitext( fName )
       dir                 = dir.split( os.sep )
-      
+
       return ( drive, dir, fName, extension )
-   
+
    def asSystemDependantPath( self ):
       return os.path.join( [ self._drive, self._dir, self._fileName, self._extension ] )
 
    def move( self, newName, overwrite=False ):
       pass
-   
+
    def copy( self, newName, overwrite=False ):
       pass
-   
+
    def remove( self ):
       pass
-   
+
    def exists( self ):
       pass
-   
+
    def isDirectory( self ):
       pass
 
    def isPattern( self ):
       pass
-   
+
    def realize( self ):
       pass
-   
+
    def stats( self ):
       pass
-   
+
    def traverse( self ):
       pass
-   
+
 #class FileSystem( object ):
    #def __init__( self, root=None ):
       #self._root = root
-      
+
       #if root is None:
          #self._root = ''
 
    #def iterDirTree( self, patterns='*', recurse=True, yieldFolders=False, root=None ):
       ## Expand patterns from semicolon-separated string to list
       #patterns = patterns.split( ';' )
-      
+
       #if root is None:
          #theRoot = self._root
       #else:
          #theRoot = root
-      
+
       #for path, subdirs, files in os.walk( theRoot ):
          #if yieldFolders:
             #files.extend( subdirs )
-         
+
          #files.sort( )
          #for name in files:
             #for pattern in patterns:
                #if fnmatch.fnmatch( name, pattern ):
                   #yield os.path.join( path, name )
                   #break
-            
+
             #if not recurse:
                #break
-   
+
    #def remove( self, root=None ):
       #if root is None:
          #theRoot = self._root
       #else:
          #theRoot = root
-      
+
       #for root, dirs, files in os.walk( theRoot, topdown=False ):
          #for name in files:
             #os.remove( os.path.join( root, name ) )
          #for name in dirs:
             #os.rmdir( os.path.join( root, name ) )
-   
+
    #def removeFiles( self, patterns='*', recurse=False, root=None ):
       #fileList = list( self.iterDirTree( patterns, recurse, yieldFolders=False, root=root ) ).reverse( )
       #for name in fileList:
          #os.remove( name )
-   
+
    #def makeDir( self, path ):
       #listPath = path.split( os.sep )
       #accumPath = ''
@@ -509,16 +509,16 @@ class Path( object ):
          #accumPath = os.path.join( accumPath, name )
          #if not os.path.exists( accumPath ):
             #os.mkdir( accumPath )
-   
+
    #def removeDir( self, path ):
       #os.rmdir( path )
 
    #def currentDir( self ):
       #return os.getcwd( )
-   
+
    #def changeDir( self, path ):
       #os.chdir( path )
-   
+
    #def exists( self, path ):
       #return os.path.exists( path )
 
@@ -527,7 +527,6 @@ class Path( object ):
 
    #def rename( self, oldName, newName ):
       #os.rename( oldName, newName )
-   
+
    #def copy( self, pattern, dest ):
       #pass
-

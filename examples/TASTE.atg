@@ -111,7 +111,7 @@ PRODUCTIONS
       "END"                              (. Fixup(fix)                       .)
     | "WHILE"                            (. loopstart = pc                   .)
       Expression<out type>               (. if type != BOOL:
-                                               SemError(122) 
+                                               SemError(122)
                                             fix = pc + 1
                                             Emit2(FJMP, 0)                   .)
       "DO" StatSeq                       (. Emit2(JMP, loopstart)

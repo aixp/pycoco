@@ -29,7 +29,7 @@ COMPILER Calc
    def setVar( self, spix, val ):
       self.VARS[ spix ] = val
 
-IGNORECASE    
+IGNORECASE
 
 CHARACTERS
   letter = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
