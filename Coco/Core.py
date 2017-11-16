@@ -31,9 +31,9 @@ import sys
 import copy
 from optparse import OptionParser
 
-from Trace import Trace
-from Errors import Errors
-from CharClass import CharClass
+from .Trace import Trace
+from .Errors import Errors
+from .CharClass import CharClass
 
 class Comment( object ):
    ''' info about comment syntax'''

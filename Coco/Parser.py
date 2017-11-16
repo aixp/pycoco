@@ -26,23 +26,16 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 
-from Errors import Errors
-from CharClass import CharClass
-from Core import Node
-from Core import DFA
-from Core import Graph
-from Core import Symbol
-from Core import Tab
-from Core import Comment
-from DriverGen import DriverGen
-from ParserGen import ParserGen
+from .Errors import Errors
+from .CharClass import CharClass
+from .Core import Node, DFA, Graph, Symbol, Tab, Comment
+from .DriverGen import DriverGen
+from .ParserGen import ParserGen
 
 
 import sys
 
-from Scanner import Token
-from Scanner import Scanner
-from Scanner import Position
+from .Scanner import Token, Scanner, Position
 
 class Parser( object ):
    _EOF = 0

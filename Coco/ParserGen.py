@@ -30,13 +30,10 @@ import os
 import os.path
 import StringIO
 
-from Errors import Errors
-from Trace import Trace
-from Core import Node
-from Core import DFA
-from Core import Symbol
-from Core import Tab
-from CodeGenerator import CodeGenerator
+from .Errors import Errors
+from .Trace import Trace
+from .Core import Node, DFA, Symbol, Tab
+from .CodeGenerator import CodeGenerator
 
 class MyLoopBreak( Exception ):
    pass

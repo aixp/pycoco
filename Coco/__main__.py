@@ -49,17 +49,16 @@ import sys
 import os
 import os.path
 
-from Scanner import Scanner
-from Errors import Errors
-from Trace import Trace
-from Core import DFA
-from Core import Tab
-from DriverGen import DriverGen
-from ParserGen import ParserGen
-from Parser import Parser
-from CodeGenerator import CodeGenerator
+from .Scanner import Scanner
+from .Errors import Errors
+from .Trace import Trace
+from .Core import DFA, Tab
+from .DriverGen import DriverGen
+from .ParserGen import ParserGen
+from .Parser import Parser
+from .CodeGenerator import CodeGenerator
 
-from setupInfo import MetaData
+from .setupInfo import MetaData
 
 
 ROOT_DIR = os.path.dirname( __file__ )

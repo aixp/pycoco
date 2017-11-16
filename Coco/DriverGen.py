@@ -27,9 +27,9 @@
 #-------------------------------------------------------------------------*/
 import os
 import os.path
-from Errors import Errors
-from Core import Tab
-from CodeGenerator import CodeGenerator
+from .Errors import Errors
+from .Core import Tab
+from .CodeGenerator import CodeGenerator
 
 class DriverGen( object ):
    EOF            =  -1
