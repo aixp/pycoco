@@ -1,8 +1,9 @@
 import os
-import os.path
+import io
 import traceback
 import shutil
 import unittest
+import subprocess
 
 from .util import *
 
@@ -26,24 +27,35 @@ class CocoTester( object ):
       outputFileName=os.path.join(dirName, 'Output.txt')
       traceFileName=os.path.join(dirName, 'Trace.txt')
       parserFileName=os.path.join(dirName, 'Parser.py')
-      scannerFileName=os.path.join(dirName, 'Parser.py')
+      scannerFileName=os.path.join(dirName, 'Scanner.py')
       
-      outputResFileName=os.path.join(tmpDir, 'output.txt')
       traceResFileName=os.path.join(tmpDir, 'trace.txt')
       parserResFileName=os.path.join(tmpDir, 'Parser.py')
-      scannerResFileName=os.path.join(tmpDir, 'Parser.py')
+      scannerResFileName=os.path.join(tmpDir, 'Scanner.py')
       
       class Test(unittest.TestCase):
+         maxDiff=None
          def setUpClass():
             print('Running test: '+name)
-            shell(self._compiler + ' "' + testFileName + '"> "' + outputResFileName+'"')
+            with subprocess.Popen(
+               [
+                  "python",
+                  "-m", self._compiler, "-i", '-O', tmpDir, testFileName
+               ],
+               shell=True,
+               stdout=subprocess.PIPE
+            ) as proc:
+               proc.wait()
+               __class__.output=io.TextIOWrapper(proc.stdout).read()
             os.makedirs(tmpDir, exist_ok=True)
          
          def testTrace(tself):
             assertFilesEqual(tself, traceResFileName, traceFileName)
          
          def testOutput(tself):
-            assertFilesEqual(tself, outputResFileName, outputFileName)
+            with open(outputFileName, "rt", encoding="utf-8") as f:
+               referenceOuput=f.read()
+            tself.assertEqual(__class__.output, referenceOuput)
          
          if not isErrorTest:
             def testGeneratedCode(tself):
@@ -51,7 +63,7 @@ class CocoTester( object ):
                assertFilesEqual(tself, scannerResFileName, scannerFileName)
          
          def tearDownClass():
-            deleteFiles( '*.py.old', 'Parser.py', 'Scanner.py', outputResFile, traceResFile )
+            deleteFiles( '*.py.old', 'Parser.py', 'Scanner.py', scannerResFileName )
       return Test
 
    def generateTests( self ):
@@ -91,5 +103,5 @@ suite = [
    ( 'TestCasing',         False )
 ]
 
-tester = CocoTester( 'python -m Coco', 'py', suite )
+tester = CocoTester( 'Coco', 'py', suite )
 tester()

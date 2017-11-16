@@ -37,25 +37,25 @@ class CharClass( object ):
       assert isinstance( name, str )
       assert isinstance( s, set )
       if name == "#":
-         name = "#" + chr(CharClass.dummyName)
-         CharClass.dummyName += 1
-      self.n = len(CharClass.classes)       # class number
+         name = "#" + chr(__class__.dummyName)
+         self.__class__.dummyName += 1
+      self.n = len(__class__.classes)       # class number
       self.name = name            # class name
       self.set = s                # set representing the class
-      CharClass.classes.append(self)
+      self.__class__.classes.append(self)
 
    @staticmethod
    def Find( nameOrSet ):
       assert isinstance( nameOrSet, (str, set) )
       if isinstance(nameOrSet,str):
          name = nameOrSet
-         for c in CharClass.classes:
+         for c in __class__.classes:
             if c.name == name:
                return c
          return None
       else:
          s = nameOrSet
-         for c in CharClass.classes:
+         for c in __class__.classes:
             if s == c.set: #Sets.Equals(s, c.set):
                return c
          return None
@@ -63,7 +63,7 @@ class CharClass( object ):
    @staticmethod
    def Set( i ):
       assert isinstance( i, int )
-      return CharClass.classes[i].set
+      return __class__.classes[i].set
 
    @staticmethod
    def Ch( ch ):
@@ -77,7 +77,7 @@ class CharClass( object ):
 
    @staticmethod
    def WriteClasses( ):
-      for c in CharClass.classes:
+      for c in __class__.classes:
          Trace.Write(str(c.name), -10)
          Trace.Write(': ')
          c.WriteSet( )
@@ -102,6 +102,6 @@ class CharClass( object ):
          while i < mx and (i in s):
             i += 1
          if j < (i - 1):
-            Trace.Write(str(CharClass.Ch(j)) + ".." + str(CharClass.Ch(i-1)) + " ")
+            Trace.Write(str(self.__class__.Ch(j)) + ".." + str(self.__class__.Ch(i-1)) + " ")
          else:
-            Trace.Write(str(CharClass.Ch(j) + " "))
+            Trace.Write(str(self.__class__.Ch(j) + " "))

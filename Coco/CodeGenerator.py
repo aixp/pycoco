@@ -10,6 +10,7 @@ class CodeGenerator( object ):
    indent_unit = '   '
 
    sourceDir   = None
+   outputDir   = None
    frameDir    = None
 
    def __init__( self ):
@@ -22,10 +23,10 @@ class CodeGenerator( object ):
 
       self._frameFile = None
       for frameName in frameFileName:
-         fr = os.path.join( CodeGenerator.sourceDir, frameName )
+         fr = os.path.join( self.__class__.sourceDir, frameName )
          if not os.path.exists( fr ):
-            if CodeGenerator.frameDir is not None:
-               fr = os.path.join( CodeGenerator.frameDir, frameName )
+            if self.__class__.frameDir is not None:
+               fr = os.path.join( self.__class__.frameDir, frameName )
          try:
             self._frameFile = open( fr, 'rt', encoding="utf-8")
             break
@@ -36,7 +37,7 @@ class CodeGenerator( object ):
          raise RuntimeError( '-- Compiler Error: Cannot open ' + frameFileName[0] )
 
       try:
-         fn = os.path.join( CodeGenerator.sourceDir, outputFileName )
+         fn = os.path.join( self.__class__.outputDir, outputFileName )
          fn = str(fn)
          if backup and os.path.exists( fn ):
             if os.path.exists( fn + '.old' ):
@@ -57,7 +58,7 @@ class CodeGenerator( object ):
       endOfStopString = len(stop) - 1
       ch = self.frameRead( )
 
-      while ch != CodeGenerator.EOF:
+      while ch != self.__class__.EOF:
          if ch == startCh:
             i = 0
             if i == endOfStopString:
@@ -71,12 +72,12 @@ class CodeGenerator( object ):
                i += 1
             # stop[0..i-1] found; continue with last read character
             self._outputFile.write( stop[0:i] )
-         elif ch == CodeGenerator.LF:
-            if last != CodeGenerator.CR:
+         elif ch == self.__class__.LF:
+            if last != self.__class__.CR:
                self._outputFile.write( '\n' )
             last = ch
             ch = self.frameRead( )
-         elif ch == CodeGenerator.CR:
+         elif ch == self.__class__.CR:
             self._outputFile.write( '\n' )
             last = ch
             ch = self.frameRead()
@@ -131,7 +132,7 @@ class CodeGenerator( object ):
 
    def Indent( self, n ):
       assert isinstance( n, int )
-      self._outputFile.write( CodeGenerator.indent_unit * n )
+      self._outputFile.write( self.__class__.indent_unit * n )
 
    def Ch(ch):
       if isinstance(self, ch, int):

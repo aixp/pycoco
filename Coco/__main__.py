@@ -72,6 +72,9 @@ class CocoCli(CocoArgs):
    def main(self, ATGName:plumbum.cli.ExistingFile):
       Tab.SetDDT( self )
       dirName, fileName = os.path.split(ATGName)
+      
+      if not self.outputDir:
+         self.outputDir=dirName
 
       # Setup the default frame directory
       try:
@@ -79,7 +82,6 @@ class CocoCli(CocoArgs):
             framesDir = self.frameFileDir
          else:
             framesDir = os.path.join( ROOT_DIR, 'frames' )
-
          CodeGenerator.frameDir = framesDir
          Tab.frameDir           = framesDir
       except:
@@ -98,15 +100,17 @@ class CocoCli(CocoArgs):
       scanner = Scanner( strVal )
       parser  = Parser( )
 
-      Errors.Init(fileName, dirName, Tab.ddt[5], parser.getParsingPos, parser.errorMessages)
-      Trace.Init(dirName)
+      Errors.Init(fileName, self.outputDir, Tab.ddt[5], parser.getParsingPos, parser.errorMessages)
+      Trace.Init(self.outputDir)
       Tab.Init()
-      DFA.Init(fileName, dirName)
+      DFA.Init(fileName, dirName, self.outputDir)
 
       CodeGenerator.sourceDir = dirName
       CodeGenerator.frameDir  = Tab.frameDir
+      CodeGenerator.outputDir = self.outputDir
+      
       ParserGen.Init(fileName, dirName)
-      DriverGen.Init(fileName, dirName)
+      DriverGen.Init(fileName, dirName, self.outputDir)
       parser.Parse( scanner )
       Errors.Summarize( scanner.buffer )
       Trace.Close()

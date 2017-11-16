@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------
-#ParserGen.py -- The parser generation routines.
+#__class__.py -- The parser generation routines.
 #Compiler Generator Coco/R,
 #Copyright (c) 1990, 2004 Hanspeter Moessenboeck, University of Linz
 #extended by M. Loeberbauer & A. Woess, Univ. of Linz
@@ -71,51 +71,51 @@ class ParserGen( object ):
    def GenErrorMsg( errTyp, sym ):
       assert isinstance( errTyp, int )
       assert isinstance( sym, Symbol )
-      ParserGen.errorNr += 1
-      ParserGen.err.write( ParserGen.ls + '      ' + str(ParserGen.errorNr) + ' : "' )
-      if errTyp == ParserGen.tErr:
+      __class__.errorNr += 1
+      __class__.err.write( __class__.ls + '      ' + str(__class__.errorNr) + ' : "' )
+      if errTyp == __class__.tErr:
          if sym.name[0] == '"':
-            ParserGen.err.write( str(DFA.Escape( sym.name )) + ' expected' )
+            __class__.err.write( str(DFA.Escape( sym.name )) + ' expected' )
          else:
-            ParserGen.err.write( str(sym.name) + ' expected' )
-      elif errTyp == ParserGen.altErr:
-         ParserGen.err.write( 'invalid ' + str(sym.name) )
-      elif errTyp == ParserGen.syncErr:
-         ParserGen.err.write( 'this symbol not expected in ' + str(sym.name) )
-      ParserGen.err.write('",' )
+            __class__.err.write( str(sym.name) + ' expected' )
+      elif errTyp == __class__.altErr:
+         __class__.err.write( 'invalid ' + str(sym.name) )
+      elif errTyp == __class__.syncErr:
+         __class__.err.write( 'this symbol not expected in ' + str(sym.name) )
+      __class__.err.write('",' )
 
    @staticmethod
    def NewCondSet( s ):
       assert isinstance( s, set )
-      for i in range( 1, len(ParserGen.symSet) ):
+      for i in range( 1, len(__class__.symSet) ):
         # skip symSet[0] (reserved for union of SYNC sets)
-        if s == ParserGen.symSet[i]: #s.equals( ParserGen.symSet[i] ):
+        if s == __class__.symSet[i]: #s.equals( __class__.symSet[i] ):
            return i
-      ParserGen.symSet.append( copy.copy(s) )
-      return len(ParserGen.symSet) - 1
+      __class__.symSet.append( copy.copy(s) )
+      return len(__class__.symSet) - 1
 
    @staticmethod
    def GenCond( s, p ):
       assert isinstance( s, set  )
       assert isinstance( p, Node )
       if p.typ == Node.rslv:
-         ParserGen.codeGen.CopySourcePart( p.pos, 0 )
+         __class__.codeGen.CopySourcePart( p.pos, 0 )
       else:
          n = len(s)
          if n == 0:
-            ParserGen.codeGen.write( 'False' ) # should never happen
-         elif n <= ParserGen.maxTerm:
+            __class__.codeGen.write( 'False' ) # should never happen
+         elif n <= __class__.maxTerm:
             for i in range( 0, len(Symbol.terminals) ):
                sym = Symbol.terminals[i]
                assert isinstance( sym, Symbol )
                if sym.n in s:
-                  ParserGen.codeGen.write( 'self.la.kind == ')
-                  ParserGen.PrintTermName( sym )
+                  __class__.codeGen.write( 'self.la.kind == ')
+                  __class__.PrintTermName( sym )
                   n -= 1
                   if n > 0:
-                     ParserGen.codeGen.write( ' or ' )
+                     __class__.codeGen.write( ' or ' )
          else:
-            ParserGen.codeGen.write( 'self.StartOf(' + str(ParserGen.NewCondSet( s )) + ')' )
+            __class__.codeGen.write( 'self.StartOf(' + str(__class__.NewCondSet( s )) + ')' )
 
    @staticmethod
    def GenCode( p, indent, isChecked ):
@@ -124,86 +124,86 @@ class ParserGen( object ):
       assert isinstance( isChecked, set )
       while p is not None:
          if p.typ == Node.nt:       # Non-Terminals
-            ParserGen.codeGen.Indent( indent )
+            __class__.codeGen.Indent( indent )
             if p.retVar is not None:
-               ParserGen.codeGen.write( p.retVar + ' = ' )
-            ParserGen.codeGen.write( 'self.' + p.sym.name + '(' )
-            ParserGen.codeGen.CopySourcePart( p.pos, 0 )
-            ParserGen.codeGen.write( ')\n' )
+               __class__.codeGen.write( p.retVar + ' = ' )
+            __class__.codeGen.write( 'self.' + p.sym.name + '(' )
+            __class__.codeGen.CopySourcePart( p.pos, 0 )
+            __class__.codeGen.write( ')\n' )
          elif p.typ == Node.t:      # Terminals
-            ParserGen.codeGen.Indent( indent )
+            __class__.codeGen.Indent( indent )
             if p.sym.n in isChecked:
-               ParserGen.codeGen.write( 'self.Get( )\n' )
+               __class__.codeGen.write( 'self.Get( )\n' )
             else:
-               ParserGen.codeGen.write( 'self.Expect(' )
-               ParserGen.PrintTermName( p.sym )
-               ParserGen.codeGen.write( ')\n' )
+               __class__.codeGen.write( 'self.Expect(' )
+               __class__.PrintTermName( p.sym )
+               __class__.codeGen.write( ')\n' )
          elif p.typ == Node.wt:
-            ParserGen.codeGen.Indent( indent )
-            s1 = Tab.Expected( p.next, ParserGen.curSy )
+            __class__.codeGen.Indent( indent )
+            s1 = Tab.Expected( p.next, __class__.curSy )
             s1 |= Tab.allSyncSets
-            ParserGen.codeGen.write( 'self.ExpectWeak(' )
-            ParserGen.PrintTermName( p.sym )
-            ParserGen.codeGen.write( ', ' + str(ParserGen.NewCondSet( s1 )) + ')\n' )
+            __class__.codeGen.write( 'self.ExpectWeak(' )
+            __class__.PrintTermName( p.sym )
+            __class__.codeGen.write( ', ' + str(__class__.NewCondSet( s1 )) + ')\n' )
          elif p.typ == Node.any:
-            ParserGen.codeGen.Indent( indent )
-            ParserGen.codeGen.write( 'self.Get()\n' )
+            __class__.codeGen.Indent( indent )
+            __class__.codeGen.write( 'self.Get()\n' )
          elif p.typ == Node.eps:
-            ParserGen.codeGen.Indent( indent )
-            ParserGen.codeGen.write( 'pass\n' )
+            __class__.codeGen.Indent( indent )
+            __class__.codeGen.write( 'pass\n' )
          elif p.typ == Node.rslv:
-            #ParserGen.codeGen.Indent( indent )
-            #ParserGen.codeGen.write( 'pass\n' )
+            #__class__.codeGen.Indent( indent )
+            #__class__.codeGen.write( 'pass\n' )
             pass   # Nothing to do
          elif p.typ == Node.sem:
-            ParserGen.codeGen.CopySourcePart( p.pos, indent )
+            __class__.codeGen.CopySourcePart( p.pos, indent )
          elif p.typ == Node.sync:
-            ParserGen.codeGen.Indent( indent)
-            ParserGen.GenErrorMsg( ParserGen.syncErr, ParserGen.curSy )
+            __class__.codeGen.Indent( indent)
+            __class__.GenErrorMsg( __class__.syncErr, __class__.curSy )
             s1 = copy.copy(p.set)
-            ParserGen.codeGen.write( 'while not (' )
-            ParserGen.GenCond( s1,p )
-            ParserGen.codeGen.write( '):\n' )
-            ParserGen.codeGen.Indent( indent+1 )
-            ParserGen.codeGen.write( 'self.SynErr(' + str(ParserGen.errorNr) + ')\n' )
-            ParserGen.codeGen.Indent( indent+1 )
-            ParserGen.codeGen.write( 'self.Get()\n' )
+            __class__.codeGen.write( 'while not (' )
+            __class__.GenCond( s1,p )
+            __class__.codeGen.write( '):\n' )
+            __class__.codeGen.Indent( indent+1 )
+            __class__.codeGen.write( 'self.SynErr(' + str(__class__.errorNr) + ')\n' )
+            __class__.codeGen.Indent( indent+1 )
+            __class__.codeGen.write( 'self.Get()\n' )
          elif p.typ == Node.alt:
             s1 = Tab.First( p )
             p2 = p
             equal = (s1 == isChecked)
             while p2 is not None:
-               s1 = Tab.Expected( p2.sub, ParserGen.curSy )
-               ParserGen.codeGen.Indent( indent )
+               s1 = Tab.Expected( p2.sub, __class__.curSy )
+               __class__.codeGen.Indent( indent )
                if p2 == p:
-                  ParserGen.codeGen.write( 'if ' )
-                  ParserGen.GenCond( s1, p2.sub )
-                  ParserGen.codeGen.write( ':\n' )
+                  __class__.codeGen.write( 'if ' )
+                  __class__.GenCond( s1, p2.sub )
+                  __class__.codeGen.write( ':\n' )
                elif p2.down is None and equal:
-                  ParserGen.codeGen.write( 'else:\n' )
+                  __class__.codeGen.write( 'else:\n' )
                else:
-                  ParserGen.codeGen.write( 'elif ' )
-                  ParserGen.GenCond( s1, p2.sub )
-                  ParserGen.codeGen.write( ':\n' )
+                  __class__.codeGen.write( 'elif ' )
+                  __class__.GenCond( s1, p2.sub )
+                  __class__.codeGen.write( ':\n' )
                s1 |= isChecked
-               ParserGen.GenCode( p2.sub, indent+1, s1 )
+               __class__.GenCode( p2.sub, indent+1, s1 )
                p2 = p2.down
             if not equal:
-               ParserGen.codeGen.Indent( indent )
-               ParserGen.GenErrorMsg( ParserGen.altErr, ParserGen.curSy )
-               ParserGen.codeGen.write( 'else:\n' )
-               ParserGen.codeGen.Indent( indent+1 )
-               ParserGen.codeGen.write( 'self.SynErr(' + str(ParserGen.errorNr) + ')\n' )
+               __class__.codeGen.Indent( indent )
+               __class__.GenErrorMsg( __class__.altErr, __class__.curSy )
+               __class__.codeGen.write( 'else:\n' )
+               __class__.codeGen.Indent( indent+1 )
+               __class__.codeGen.write( 'self.SynErr(' + str(__class__.errorNr) + ')\n' )
          elif p.typ == Node.iter:
-            ParserGen.codeGen.Indent( indent )
+            __class__.codeGen.Indent( indent )
             p2 = p.sub
-            ParserGen.codeGen.write( 'while ' )
+            __class__.codeGen.write( 'while ' )
             if p2.typ == Node.wt:
-               s1 = Tab.Expected( p2.next, ParserGen.curSy )
-               s2 = Tab.Expected( p.next, ParserGen.curSy )
-               ParserGen.codeGen.write( 'self.WeakSeparator(' )
-               ParserGen.PrintTermName( p2.sym )
-               ParserGen.codeGen.write( ', ' + str(ParserGen.NewCondSet(s1)) + ', ' + str(ParserGen.NewCondSet(s2)) + ')' )
+               s1 = Tab.Expected( p2.next, __class__.curSy )
+               s2 = Tab.Expected( p.next, __class__.curSy )
+               __class__.codeGen.write( 'self.WeakSeparator(' )
+               __class__.PrintTermName( p2.sym )
+               __class__.codeGen.write( ', ' + str(__class__.NewCondSet(s1)) + ', ' + str(__class__.NewCondSet(s2)) + ')' )
                s1 = set( )
                if p2.up or p2.next is None:
                   p2 = None
@@ -211,17 +211,17 @@ class ParserGen( object ):
                   p2 = p2.next
             else:
                s1 = Tab.First( p2 )
-               ParserGen.GenCond( s1, p2 )
-            ParserGen.codeGen.write( ':\n' )
-            ParserGen.GenCode( p2,indent+1, s1 )
-            ParserGen.codeGen.write( '\n' )
+               __class__.GenCond( s1, p2 )
+            __class__.codeGen.write( ':\n' )
+            __class__.GenCode( p2,indent+1, s1 )
+            __class__.codeGen.write( '\n' )
          elif p.typ == Node.opt:
             s1 = Tab.First( p.sub )
-            ParserGen.codeGen.Indent( indent )
-            ParserGen.codeGen.write( 'if (' )
-            ParserGen.GenCond( s1, p.sub )
-            ParserGen.codeGen.write( '):\n' )
-            ParserGen.GenCode( p.sub, indent+1, s1 )
+            __class__.codeGen.Indent( indent )
+            __class__.codeGen.write( 'if (' )
+            __class__.GenCond( s1, p.sub )
+            __class__.codeGen.write( '):\n' )
+            __class__.GenCode( p.sub, indent+1, s1 )
 
          if p.typ != Node.eps and p.typ != Node.sem and p.typ != Node.sync:
             for val in range( 0, len(isChecked) ):
@@ -237,119 +237,119 @@ class ParserGen( object ):
       assert isinstance( withNames, bool )
       for sym in Symbol.terminals:
          if sym.name[0].isalpha( ):
-            ParserGen.codeGen.write( '   _' + sym.name + ' = ' + str(sym.n) + '\n' )
+            __class__.codeGen.write( '   _' + sym.name + ' = ' + str(sym.n) + '\n' )
       if withNames:
-         ParserGen.codeGen.write( '   # terminals\n')
+         __class__.codeGen.write( '   # terminals\n')
          for sym in Symbol.terminals:
-            ParserGen.codeGen.write( '   ' + sym.symName + ' = ' + str(sym.n) + '\n' )
-         ParserGen.codeGen.write( '   # pragmas\n' )
+            __class__.codeGen.write( '   ' + sym.symName + ' = ' + str(sym.n) + '\n' )
+         __class__.codeGen.write( '   # pragmas\n' )
          for sym in Symbol.pragmas:
-            ParserGen.codeGen.write( '   ' + sym.symName + ' = ' + str(sym.n) + '\n' )
-         ParserGen.codeGen.write( '\n' )
+            __class__.codeGen.write( '   ' + sym.symName + ' = ' + str(sym.n) + '\n' )
+         __class__.codeGen.write( '\n' )
 
    @staticmethod
    def GenPragmas( ):
       for sym in Symbol.pragmas:
-         ParserGen.codeGen.write( '   _' + str(sym.name) + ' = ' + str(sym.n) + '\n' )
+         __class__.codeGen.write( '   _' + str(sym.name) + ' = ' + str(sym.n) + '\n' )
 
    @staticmethod
    def GenCodePragmas( ):
       for sym in Symbol.pragmas:
-         ParserGen.codeGen.write( 'if self.la.kind == ' )
-         ParserGen.PrintTermName( sym )
-         ParserGen.codeGen.write( ':\n' )
-         ParserGen.codeGen.CopySourcePart( sym.semPos, 4, True )
+         __class__.codeGen.write( 'if self.la.kind == ' )
+         __class__.PrintTermName( sym )
+         __class__.codeGen.write( ':\n' )
+         __class__.codeGen.CopySourcePart( sym.semPos, 4, True )
 
    @staticmethod
    def GenProductions( ):
       for sym in Symbol.nonterminals:
-         ParserGen.curSy = sym
+         __class__.curSy = sym
 
          # Generate the function header
-         ParserGen.codeGen.write( '   def ' + sym.name + '( self' )
+         __class__.codeGen.write( '   def ' + sym.name + '( self' )
          if sym.attrPos is not None:
-            ParserGen.codeGen.write( ', ' )
-         ParserGen.codeGen.CopySourcePart( sym.attrPos, 0 )
-         ParserGen.codeGen.write( ' ):\n' )
+            __class__.codeGen.write( ', ' )
+         __class__.codeGen.CopySourcePart( sym.attrPos, 0 )
+         __class__.codeGen.write( ' ):\n' )
 
          # Generate the function body
-         ParserGen.codeGen.CopySourcePart( sym.semPos, 2 )
-         ParserGen.GenCode( sym.graph, 2, set( ) )
+         __class__.codeGen.CopySourcePart( sym.semPos, 2 )
+         __class__.GenCode( sym.graph, 2, set( ) )
 
          # Generate the function close
          if sym.retVar is not None:
-            ParserGen.codeGen.write( '      return ' + sym.retVar + '\n' )
-         ParserGen.codeGen.write( '\n' )
+            __class__.codeGen.write( '      return ' + sym.retVar + '\n' )
+         __class__.codeGen.write( '\n' )
 
    @staticmethod
    def InitSets( ):
-      for i in range(0,len(ParserGen.symSet)):
-         s = ParserGen.symSet[i]
-         ParserGen.codeGen.write( '      [' )
+      for i in range(0,len(__class__.symSet)):
+         s = __class__.symSet[i]
+         __class__.codeGen.write( '      [' )
          j = 0
          for sym in Symbol.terminals:
             if sym.n in s:
-               ParserGen.codeGen.write( 'T,' )
+               __class__.codeGen.write( 'T,' )
             else:
-               ParserGen.codeGen.write( 'x,' )
+               __class__.codeGen.write( 'x,' )
             j += 1
             if j%4 == 0:
-               ParserGen.codeGen.write( ' ' )
-         if i == (len(ParserGen.symSet) - 1):
-            ParserGen.codeGen.write( 'x]\n' )
+               __class__.codeGen.write( ' ' )
+         if i == (len(__class__.symSet) - 1):
+            __class__.codeGen.write( 'x]\n' )
          else:
-            ParserGen.codeGen.write( 'x],\n' )
+            __class__.codeGen.write( 'x],\n' )
 
    @staticmethod
    def Init( fn, dir ):
       assert isinstance( fn, str )
       assert isinstance( dir, str )
-      ParserGen.srcName = fn
-      ParserGen.srcDir  = dir
-      ParserGen.errorNr = -1
-      ParserGen.usingPos = None
+      __class__.srcName = fn
+      __class__.srcDir  = dir
+      __class__.errorNr = -1
+      __class__.usingPos = None
 
    @staticmethod
    def WriteParser( withNames ):
       assert isinstance( withNames, bool )
       assert isinstance( Tab.allSyncSets, set )
-      ParserGen.symSet.append( Tab.allSyncSets )
+      __class__.symSet.append( Tab.allSyncSets )
 
-      ParserGen.codeGen.openFiles( 'Parser.frame', ParserGen.srcName,
+      __class__.codeGen.openFiles( 'Parser.frame', __class__.srcName,
             'Parser.py', True )
 
       if withNames:
          Tab.AssignNames( )
 
-      ParserGen.err = io.StringIO( )
+      __class__.err = io.StringIO( )
       for sym in Symbol.terminals:
-         ParserGen.GenErrorMsg( ParserGen.tErr, sym )
+         __class__.GenErrorMsg( __class__.tErr, sym )
 
-      ParserGen.codeGen.CopyFramePart( '-->begin' )
-      if ParserGen.usingPos != None:
-         ParserGen.codeGen.write( '\n' )
-         ParserGen.codeGen.CopySourcePart( ParserGen.usingPos, 0 )
-      ParserGen.codeGen.CopyFramePart( '-->constants' )
-      ParserGen.GenTokens( withNames )
-      ParserGen.codeGen.write( '   maxT = ' + str(len(Symbol.terminals) - 1) + '\n')
-      ParserGen.GenPragmas( )
-      ParserGen.codeGen.CopyFramePart( '-->declarations' )
-      ParserGen.codeGen.CopySourcePart( Tab.semDeclPos, 0 )
-      ParserGen.codeGen.CopyFramePart( '-->pragmas' )
-      ParserGen.GenCodePragmas( )
-      ParserGen.codeGen.CopyFramePart( '-->productions' )
-      ParserGen.GenProductions( )
-      ParserGen.codeGen.CopyFramePart( '-->parseRoot' )
-      ParserGen.codeGen.write( Tab.gramSy.name + '()\n' )
-      ParserGen.codeGen.write( '      self.Expect(' )
-      ParserGen.PrintTermName( Tab.eofSy )
-      ParserGen.codeGen.write( ')\n' )
-      ParserGen.codeGen.CopyFramePart( '-->initialization' )
-      ParserGen.InitSets( )
-      ParserGen.codeGen.CopyFramePart( '-->errors' )
-      ParserGen.codeGen.write( str(ParserGen.err.getvalue( )) )
-      ParserGen.codeGen.CopyFramePart( '$$$' )
-      ParserGen.codeGen.close( )
+      __class__.codeGen.CopyFramePart( '-->begin' )
+      if __class__.usingPos != None:
+         __class__.codeGen.write( '\n' )
+         __class__.codeGen.CopySourcePart( __class__.usingPos, 0 )
+      __class__.codeGen.CopyFramePart( '-->constants' )
+      __class__.GenTokens( withNames )
+      __class__.codeGen.write( '   maxT = ' + str(len(Symbol.terminals) - 1) + '\n')
+      __class__.GenPragmas( )
+      __class__.codeGen.CopyFramePart( '-->declarations' )
+      __class__.codeGen.CopySourcePart( Tab.semDeclPos, 0 )
+      __class__.codeGen.CopyFramePart( '-->pragmas' )
+      __class__.GenCodePragmas( )
+      __class__.codeGen.CopyFramePart( '-->productions' )
+      __class__.GenProductions( )
+      __class__.codeGen.CopyFramePart( '-->parseRoot' )
+      __class__.codeGen.write( Tab.gramSy.name + '()\n' )
+      __class__.codeGen.write( '      self.Expect(' )
+      __class__.PrintTermName( Tab.eofSy )
+      __class__.codeGen.write( ')\n' )
+      __class__.codeGen.CopyFramePart( '-->initialization' )
+      __class__.InitSets( )
+      __class__.codeGen.CopyFramePart( '-->errors' )
+      __class__.codeGen.write( str(__class__.err.getvalue( )) )
+      __class__.codeGen.CopyFramePart( '$$$' )
+      __class__.codeGen.close( )
 
    @staticmethod
    def WriteStatistics( ):
@@ -360,7 +360,7 @@ class ParserGen( object ):
       Trace.WriteLine( str(len( Symbol.terminals )) + ' terminals' )
       Trace.WriteLine( str(len( Symbol.terminals ) + len( Symbol.pragmas ) + len( Symbol.nonterminals )) + ' symbols' )
       Trace.WriteLine( str(len(Node.nodes)) + ' nodes' )
-      Trace.WriteLine( str(len(ParserGen.symSet)) + ' sets' )
+      Trace.WriteLine( str(len(__class__.symSet)) + ' sets' )
       Trace.WriteLine( )
 
    @staticmethod
@@ -368,7 +368,7 @@ class ParserGen( object ):
       assert isinstance( sym, Symbol )
       assert isinstance( sym.symName, str ) or (sym.symName is None)
       if sym.symName is None:
-         ParserGen.codeGen.write( str(sym.n) )
+         __class__.codeGen.write( str(sym.n) )
       else:
-         ParserGen.codeGen.write( 'Scanner.' )
-         ParserGen.codeGen.write( str(sym.symName) )
+         __class__.codeGen.write( 'Scanner.' )
+         __class__.codeGen.write( str(sym.symName) )

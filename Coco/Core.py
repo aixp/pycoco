@@ -1497,14 +1497,15 @@ class DFA( object ):
    hasCtxMoves = False # DFA has context transitions
    srcName = ''        # name of the attributed grammar file
    srcDir = ''         # directory of attributed grammar file
+   outDir = ''         # directory to put output
 
    @staticmethod
    def framRead():
       try:
-         return DFA.fram.read(1)
+         return __class__.fram.read(1)
       except:
          raise RuntimeError("-- error reading Scanner.frame")
-      return DFA.EOF
+      return __class__.EOF
 
         #---------- Output primitives
    @staticmethod
@@ -1564,26 +1565,26 @@ class DFA( object ):
       if top == 1 and lo[0] == 0 and hi[1] == mx-1 and hi[0]+2 == lo[1]:
          s1 = set( )
          s1.add(hi[0]+1)
-         DFA.gen.write("not ")
-         DFA.PutRange(s1)
-         DFA.gen.write(" and Scanner.ch != Scanner.buffer.EOF")
+         __class__.gen.write("not ")
+         __class__.PutRange(s1)
+         __class__.gen.write(" and Scanner.ch != Scanner.buffer.EOF")
       else:
-         DFA.gen.write("(")
+         __class__.gen.write("(")
 
          for i in range( 0, top+1 ):
             if hi[i] == lo[i]:
-               DFA.gen.write( DFA.ChCond( lo[i] ) )
+               __class__.gen.write( __class__.ChCond( lo[i] ) )
             elif (lo[i] == 0):
-               DFA.gen.write( DFA.ChCond( hi[i], '<=' ) )
+               __class__.gen.write( __class__.ChCond( hi[i], '<=' ) )
             else:
-               DFA.gen.write( DFA.ChCond( lo[i], '>=' ) )
-               DFA.gen.write( ' and ' + DFA.ChCond( hi[i], '<=' ) )
+               __class__.gen.write( __class__.ChCond( lo[i], '>=' ) )
+               __class__.gen.write( ' and ' + __class__.ChCond( hi[i], '<=' ) )
             if i < top:
-               DFA.gen.write('\n')
-               DFA.gen.write("                 or ")
+               __class__.gen.write('\n')
+               __class__.gen.write("                 or ")
          if 'ANYCHAR' in s:
-            DFA.gen.write(' or ord(self.ch) > %d' % CharClass.charSetSize)
-         DFA.gen.write(")")
+            __class__.gen.write(' or ord(self.ch) > %d' % CharClass.charSetSize)
+         __class__.gen.write(")")
 
         #---------- String handling
    @staticmethod
@@ -1623,7 +1624,7 @@ class DFA( object ):
             ch = s[i+1]
             if ch in ( 'u', 'x' ):
                if i + 4 <= len(s):
-                  buf += DFA.Hex2Char(s[i+2: i+6])
+                  buf += __class__.Hex2Char(s[i+2: i+6])
                   i += 6
                else:
                   Errors.SemErr("bad escape sequence in string or character")
@@ -1661,7 +1662,7 @@ class DFA( object ):
                      '\r': "\\r",
                      '\n': "\\n" }[ ch ]
          elif ch < ' ' or ch > chr(127): #'\x7f'
-            buf += DFA.Char2Hex(ch)
+            buf += __class__.Char2Hex(ch)
          else:
             buf += ch
       return buf
@@ -1670,11 +1671,11 @@ class DFA( object ):
    @staticmethod
    def NewState():
       s = State()   # State
-      if DFA.firstState is None:
-         DFA.firstState = s
+      if __class__.firstState is None:
+         __class__.firstState = s
       else:
-         DFA.lastState.next = s
-      DFA.lastState = s
+         __class__.lastState.next = s
+      __class__.lastState = s
       return s
 
    @staticmethod
@@ -1684,7 +1685,7 @@ class DFA( object ):
       assert isinstance(typ,int)
       assert isinstance(sym,(int,str))
       assert isinstance(tc,int)
-      if to == DFA.firstState:
+      if to == __class__.firstState:
          Errors.SemErr("token must not start with an iteration")
       if isinstance(sym, str):
          sym = ord(sym)
@@ -1693,11 +1694,11 @@ class DFA( object ):
       a.target = t
       frm.AddAction(a)
       if typ == Node.clas:
-         DFA.curSy.tokenKind = Symbol.classToken
+         __class__.curSy.tokenKind = Symbol.classToken
 
    @staticmethod
    def CombineShifts():
-      state = DFA.firstState
+      state = __class__.firstState
       while state is not None:
          a = state.firstAction
          while a is not None:
@@ -1725,18 +1726,18 @@ class DFA( object ):
       used.add(state.nr)
       a = state.firstAction
       while a is not None:
-         DFA.FindUsedStates(a.target.state, used)
+         __class__.FindUsedStates(a.target.state, used)
          a = a.next
 
    @staticmethod
    def DeleteRedundantStates():
       newState = [ None for x in range(State.lastNr + 1) ]
       used = set( )
-      DFA.FindUsedStates(DFA.firstState, used)
+      __class__.FindUsedStates(__class__.firstState, used)
       # combine equal final states
-      s1 = DFA.firstState.next
+      s1 = __class__.firstState.next
       while s1 is not None:
-         # DFA.firstState cannot be final
+         # __class__.firstState cannot be final
          if ((s1.nr in used) and (s1.endOf is not None)
               and (s1.firstAction is None) and not s1.ctx):
             s2 = s1.next
@@ -1748,7 +1749,7 @@ class DFA( object ):
                s2 = s2.next
          s1 = s1.next
 
-      state = DFA.firstState
+      state = __class__.firstState
       while state is not None:
          if state.nr in used:
             a = state.firstAction
@@ -1759,24 +1760,24 @@ class DFA( object ):
          state = state.next
 
       # delete unused states
-      DFA.lastState = DFA.firstState
-      State.lastNr = 0     # DFA.firstState has number 0
-      state = DFA.firstState.next
+      __class__.lastState = __class__.firstState
+      State.lastNr = 0     # __class__.firstState has number 0
+      state = __class__.firstState.next
       while state is not None:
          if state.nr in used:
             State.lastNr += 1
             state.nr = State.lastNr
-            DFA.lastState = state
+            __class__.lastState = state
          else:
-            DFA.lastState.next = state.next
+            __class__.lastState.next = state.next
          state = state.next
 
    @staticmethod
    def TheState(p):
       assert isinstance(p, Node) or (p is None)
       if p is None:
-         state = DFA.NewState()
-         state.endOf = DFA.curSy
+         state = __class__.NewState()
+         state.endOf = __class__.curSy
          return state
       else:
          return p.state
@@ -1790,14 +1791,14 @@ class DFA( object ):
          return
       stepped.add(p.n)
       if p.typ in (Node.clas, Node.chr):
-         DFA.NewTransition(frm, DFA.TheState(p.next), p.typ, p.val, p.code)
+         __class__.NewTransition(frm, __class__.TheState(p.next), p.typ, p.val, p.code)
       elif p.typ == Node.alt:
-         DFA.Step(frm, p.sub, stepped)
-         DFA.Step(frm, p.down, stepped)
+         __class__.Step(frm, p.sub, stepped)
+         __class__.Step(frm, p.down, stepped)
       elif p.typ in (Node.iter, Node.opt):
          if (p.next is not None) and (p.next.n not in stepped):
-            DFA.Step(frm, p.next, stepped)
-         DFA.Step(frm, p.sub, stepped)
+            __class__.Step(frm, p.next, stepped)
+         __class__.Step(frm, p.sub, stepped)
 
    @staticmethod
    def NumberNodes(p, state):
@@ -1811,21 +1812,21 @@ class DFA( object ):
       if p.state is not None:
          return
       if state is None:
-         state = DFA.NewState()
+         state = __class__.NewState()
       p.state = state
       if Node.DelGraph(p):
-         state.endOf = DFA.curSy
+         state.endOf = __class__.curSy
       if p.typ in (Node.clas, Node.chr):
-         DFA.NumberNodes(p.next, None)
+         __class__.NumberNodes(p.next, None)
       elif p.typ == Node.opt:
-         DFA.NumberNodes(p.next, None)
-         DFA.NumberNodes(p.sub, state)
+         __class__.NumberNodes(p.next, None)
+         __class__.NumberNodes(p.sub, state)
       elif p.typ == Node.iter:
-         DFA.NumberNodes(p.next, state)
-         DFA.NumberNodes(p.sub, state)
+         __class__.NumberNodes(p.next, state)
+         __class__.NumberNodes(p.sub, state)
       elif p.typ == Node.alt:
-         DFA.NumberNodes(p.sub, state)
-         DFA.NumberNodes(p.down, state)
+         __class__.NumberNodes(p.sub, state)
+         __class__.NumberNodes(p.down, state)
 
    @staticmethod
    def FindTrans (p, start, marked):
@@ -1836,29 +1837,29 @@ class DFA( object ):
          return
       marked.add(p.n)
       if start:
-         DFA.Step(p.state, p, set( )) #/ start of group of equally numbered nodes
+         __class__.Step(p.state, p, set( )) #/ start of group of equally numbered nodes
       if p.typ in (Node.clas, Node.chr):
-         DFA.FindTrans(p.next, True, marked)
+         __class__.FindTrans(p.next, True, marked)
       elif p.typ == Node.opt:
-         DFA.FindTrans(p.next, True, marked)
-         DFA.FindTrans(p.sub, False, marked)
+         __class__.FindTrans(p.next, True, marked)
+         __class__.FindTrans(p.sub, False, marked)
       elif p.typ == Node.iter:
-         DFA.FindTrans(p.next, False, marked)
-         DFA.FindTrans(p.sub, False, marked)
+         __class__.FindTrans(p.next, False, marked)
+         __class__.FindTrans(p.sub, False, marked)
       elif p.typ == Node.alt:
-         DFA.FindTrans(p.sub, False, marked)
-         DFA.FindTrans(p.down, False, marked)
+         __class__.FindTrans(p.sub, False, marked)
+         __class__.FindTrans(p.down, False, marked)
 
    @staticmethod
    def ConvertToStates(p, sym):
       assert isinstance(p,Node)
       assert isinstance(sym,Symbol)
-      DFA.curGraph = p
-      DFA.curSy = sym
-      if Node.DelGraph(DFA.curGraph):
+      __class__.curGraph = p
+      __class__.curSy = sym
+      if Node.DelGraph(__class__.curGraph):
          Errors.SemErr("token might be empty")
-      DFA.NumberNodes(DFA.curGraph, DFA.firstState)
-      DFA.FindTrans(DFA.curGraph, True, set( ))
+      __class__.NumberNodes(__class__.curGraph, __class__.firstState)
+      __class__.FindTrans(__class__.curGraph, True, set( ))
 
    @staticmethod
    def MatchLiteral(s, sym):
@@ -1866,9 +1867,9 @@ class DFA( object ):
       assert isinstance(s,str)
       '''match string against current automaton; store it either as a
       fixedToken or as a litToken'''
-      s = DFA.Unescape(s[1:-1])
+      s = __class__.Unescape(s[1:-1])
       ln = len(s)
-      state = DFA.firstState   # State
+      state = __class__.firstState   # State
       a = None
       endedPrematurely = False
       for i in range(0, ln):    # try to match s against existing DFA
@@ -1881,13 +1882,13 @@ class DFA( object ):
          i = ln
       # if s was not totally consumed or leads to a non-final state => make new DFA from it
       if  (i != ln) or (state.endOf is None):
-         state = DFA.firstState
+         state = __class__.firstState
          i = 0
          a = None
-         DFA.dirtyDFA = True
+         __class__.dirtyDFA = True
       while i < ln:      # make new DFA for s[i..len-1]
-         to = DFA.NewState()   # State
-         DFA.NewTransition(state, to, Node.chr, s[i], Node.normalTrans)
+         to = __class__.NewState()   # State
+         __class__.NewTransition(state, to, Node.chr, s[i], Node.normalTrans)
          state = to
          i += 1
       matchedSym = state.endOf   # Symbol
@@ -1962,8 +1963,8 @@ class DFA( object ):
       while a is not None:
          b = a.next
          while b is not None:
-            if DFA.Overlap(a, b):
-               DFA.SplitActions(state, a, b)
+            if __class__.Overlap(a, b):
+               __class__.SplitActions(state, a, b)
                changed = True
             b = b.next
          a = a.next
@@ -1981,16 +1982,16 @@ class DFA( object ):
             endOf = param[1]
             melt = Melted.StateWithSet(targets)   # Melted
             if melt is None:
-               s = DFA.NewState()
+               s = __class__.NewState()
                s.endOf = endOf
                s.ctx = ctx
                targ = action.target
                while targ is not None:
                   s.MeltWith(targ.state)
                   targ = targ.next
-               changed = DFA.MakeUnique(s)
+               changed = __class__.MakeUnique(s)
                while changed:
-                  changed = DFA.MakeUnique(s)
+                  changed = __class__.MakeUnique(s)
                melt = Melted(targets, s)
             action.target.next = None
             action.target.state = melt.state
@@ -1998,7 +1999,7 @@ class DFA( object ):
 
    @staticmethod
    def FindCtxStates():
-      state = DFA.firstState
+      state = __class__.firstState
       while state is not None:
          a = state.firstAction
          while a is not None:
@@ -2009,22 +2010,22 @@ class DFA( object ):
 
    @staticmethod
    def MakeDeterministic():
-      DFA.lastSimState = DFA.lastState.nr
-      DFA.maxStates = 2 * DFA.lastSimState     # heuristic for set size in Melted.set
-      DFA.FindCtxStates()
-      state = DFA.firstState
+      __class__.lastSimState = __class__.lastState.nr
+      __class__.maxStates = 2 * __class__.lastSimState     # heuristic for set size in Melted.set
+      __class__.FindCtxStates()
+      state = __class__.firstState
       while state is not None:
-         changed = DFA.MakeUnique(state)
+         changed = __class__.MakeUnique(state)
          while changed:
-            changed = DFA.MakeUnique(state)
+            changed = __class__.MakeUnique(state)
          state = state.next
 
-      state = DFA.firstState
+      state = __class__.firstState
       while state is not None:
-         DFA.MeltStates(state)
+         __class__.MeltStates(state)
          state = state.next
-      DFA.DeleteRedundantStates()
-      DFA.CombineShifts()
+      __class__.DeleteRedundantStates()
+      __class__.CombineShifts()
 
    @staticmethod
    def PrintStates( ):
@@ -2033,7 +2034,7 @@ class DFA( object ):
       Trace.WriteLine("---------------")
       Trace.WriteLine( )
       Trace.WriteLine("---------- states ----------")
-      state = DFA.firstState
+      state = __class__.firstState
       while state is not None:
          first = True   # boolean
          if state.endOf is None:
@@ -2053,7 +2054,7 @@ class DFA( object ):
             if (action.typ == Node.clas):
                Trace.Write(CharClass.classes[action.sym].name)
             else:
-               Trace.Write(DFA.ReportCh(action.sym), 3)
+               Trace.Write(__class__.ReportCh(action.sym), 3)
             targ = action.target
             while targ is not None:
                Trace.Write(str(targ.state.nr), 4)
@@ -2071,100 +2072,100 @@ class DFA( object ):
    @staticmethod
    def GenComBody2( com ):
       assert isinstance(com,Comment)
-      DFA.gen.write      ("      while True:\n")
-      DFA.gen.write      ("         if " + DFA.ChCond(com.stop[0]) + ":\n")
+      __class__.gen.write      ("      while True:\n")
+      __class__.gen.write      ("         if " + __class__.ChCond(com.stop[0]) + ":\n")
       if len(com.stop) == 1:
-         DFA.gen.write   ("            level -= 1\n")
-         DFA.gen.write   ("            if level == 0:\n")
-         DFA.gen.write   ("               self.oldEols = self.line - line0\n")
-         DFA.gen.write   ("               self.NextCh()\n")
-         DFA.gen.write   ("               return True\n")
-         DFA.gen.write   ("            self.NextCh()\n")
+         __class__.gen.write   ("            level -= 1\n")
+         __class__.gen.write   ("            if level == 0:\n")
+         __class__.gen.write   ("               self.oldEols = self.line - line0\n")
+         __class__.gen.write   ("               self.NextCh()\n")
+         __class__.gen.write   ("               return True\n")
+         __class__.gen.write   ("            self.NextCh()\n")
       else:
-         DFA.gen.write   ("            self.NextCh()\n")
-         DFA.gen.write   ("            if " + DFA.ChCond(com.stop[1]) + ":\n")
-         DFA.gen.write   ("               level -= 1\n")
-         DFA.gen.write   ("               if level == 0:\n")
-         DFA.gen.write   ("                  self.oldEols = self.line - line0\n")
-         DFA.gen.write   ("                  self.NextCh()\n")
-         DFA.gen.write   ("                  return True\n")
-         DFA.gen.write   ("               self.NextCh()\n")
+         __class__.gen.write   ("            self.NextCh()\n")
+         __class__.gen.write   ("            if " + __class__.ChCond(com.stop[1]) + ":\n")
+         __class__.gen.write   ("               level -= 1\n")
+         __class__.gen.write   ("               if level == 0:\n")
+         __class__.gen.write   ("                  self.oldEols = self.line - line0\n")
+         __class__.gen.write   ("                  self.NextCh()\n")
+         __class__.gen.write   ("                  return True\n")
+         __class__.gen.write   ("               self.NextCh()\n")
       if com.nested:
-         DFA.gen.write   ("         elif " + DFA.ChCond(com.start[0]) + ":\n")
+         __class__.gen.write   ("         elif " + __class__.ChCond(com.start[0]) + ":\n")
          if (len(com.start) == 1):
-            DFA.gen.write("            level += 1\n")
-            DFA.gen.write("            self.NextCh()\n")
+            __class__.gen.write("            level += 1\n")
+            __class__.gen.write("            self.NextCh()\n")
          else:
-            DFA.gen.write("            self.NextCh()\n")
-            DFA.gen.write("            if " + DFA.ChCond(com.start[1]) + ":\n")
-            DFA.gen.write("               level += 1\n")
-            DFA.gen.write("               self.NextCh()\n")
-      DFA.gen.write      ("         elif self.ch == Buffer.EOF:\n")
-      DFA.gen.write      ("            return False\n")
-      DFA.gen.write      ("         else:\n")
-      DFA.gen.write      ("            self.NextCh()\n")
+            __class__.gen.write("            self.NextCh()\n")
+            __class__.gen.write("            if " + __class__.ChCond(com.start[1]) + ":\n")
+            __class__.gen.write("               level += 1\n")
+            __class__.gen.write("               self.NextCh()\n")
+      __class__.gen.write      ("         elif self.ch == Buffer.EOF:\n")
+      __class__.gen.write      ("            return False\n")
+      __class__.gen.write      ("         else:\n")
+      __class__.gen.write      ("            self.NextCh()\n")
 
    @staticmethod
    def GenComBody3( com):
       assert isinstance(com,Comment)
-      DFA.gen.write      ("         while True:\n")
-      DFA.gen.write      ("            if " + DFA.ChCond(com.stop[0]) + ":\n")
+      __class__.gen.write      ("         while True:\n")
+      __class__.gen.write      ("            if " + __class__.ChCond(com.stop[0]) + ":\n")
       if len(com.stop) == 1:
-         DFA.gen.write   ("               level -= 1\n")
-         DFA.gen.write   ("               if level == 0:\n")
-         DFA.gen.write   ("                  self.oldEols = self.line - line0\n")
-         DFA.gen.write   ("                  self.NextCh()\n")
-         DFA.gen.write   ("                  return True\n")
-         DFA.gen.write   ("               self.NextCh()\n")
+         __class__.gen.write   ("               level -= 1\n")
+         __class__.gen.write   ("               if level == 0:\n")
+         __class__.gen.write   ("                  self.oldEols = self.line - line0\n")
+         __class__.gen.write   ("                  self.NextCh()\n")
+         __class__.gen.write   ("                  return True\n")
+         __class__.gen.write   ("               self.NextCh()\n")
       else:
-         DFA.gen.write   ("               self.NextCh()\n")
-         DFA.gen.write   ("               if " + DFA.ChCond(com.stop[1]) + ":\n")
-         DFA.gen.write   ("                  level -= 1\n")
-         DFA.gen.write   ("                  if level == 0:\n")
-         DFA.gen.write   ("                     self.oldEols = self.line - line0\n")
-         DFA.gen.write   ("                     self.NextCh()\n")
-         DFA.gen.write   ("                     return True\n")
-         DFA.gen.write   ("                  self.NextCh()\n")
+         __class__.gen.write   ("               self.NextCh()\n")
+         __class__.gen.write   ("               if " + __class__.ChCond(com.stop[1]) + ":\n")
+         __class__.gen.write   ("                  level -= 1\n")
+         __class__.gen.write   ("                  if level == 0:\n")
+         __class__.gen.write   ("                     self.oldEols = self.line - line0\n")
+         __class__.gen.write   ("                     self.NextCh()\n")
+         __class__.gen.write   ("                     return True\n")
+         __class__.gen.write   ("                  self.NextCh()\n")
       if com.nested:
-         DFA.gen.write   ("            elif " + DFA.ChCond(com.start[0]) + ":\n")
+         __class__.gen.write   ("            elif " + __class__.ChCond(com.start[0]) + ":\n")
          if (len(com.start) == 1):
-            DFA.gen.write("               level += 1")
-            DFA.gen.write("               self.NextCh()")
+            __class__.gen.write("               level += 1")
+            __class__.gen.write("               self.NextCh()")
          else:
-            DFA.gen.write("               self.NextCh()\n")
-            DFA.gen.write("               if " + DFA.ChCond(com.start[1]) + ":\n")
-            DFA.gen.write("                  level += 1\n")
-            DFA.gen.write("                  self.NextCh()\n")
-      DFA.gen.write      ("            elif self.ch == Buffer.EOF:\n")
-      DFA.gen.write      ("               return False\n")
-      DFA.gen.write      ("            else:\n")
-      DFA.gen.write      ("               self.NextCh()\n")
+            __class__.gen.write("               self.NextCh()\n")
+            __class__.gen.write("               if " + __class__.ChCond(com.start[1]) + ":\n")
+            __class__.gen.write("                  level += 1\n")
+            __class__.gen.write("                  self.NextCh()\n")
+      __class__.gen.write      ("            elif self.ch == Buffer.EOF:\n")
+      __class__.gen.write      ("               return False\n")
+      __class__.gen.write      ("            else:\n")
+      __class__.gen.write      ("               self.NextCh()\n")
 
    @staticmethod
    def GenComment( com, i):
       assert isinstance(com,Comment)
       assert isinstance(i, int)
-      DFA.gen.write   ( '\n' )
-      DFA.gen.write   ("   def Comment" + str(i) + "( self ):\n")
-      DFA.gen.write   ("      level = 1\n")
-      DFA.gen.write   ("      line0 = self.line\n")
-      DFA.gen.write   ("      lineStart0 = self.lineStart\n")
+      __class__.gen.write   ( '\n' )
+      __class__.gen.write   ("   def Comment" + str(i) + "( self ):\n")
+      __class__.gen.write   ("      level = 1\n")
+      __class__.gen.write   ("      line0 = self.line\n")
+      __class__.gen.write   ("      lineStart0 = self.lineStart\n")
       if len(com.start) == 1:
-         DFA.gen.write("      self.NextCh()\n")
-         DFA.GenComBody2(com)
+         __class__.gen.write("      self.NextCh()\n")
+         __class__.GenComBody2(com)
       else:
-         DFA.gen.write("      self.NextCh()\n")
-         DFA.gen.write("      if " + DFA.ChCond(com.start[1]) + ":\n")
-         DFA.gen.write("         self.NextCh()\n")
-         DFA.GenComBody3(com)
-         DFA.gen.write("      else:\n")
-         DFA.gen.write("         if self.ch == Scanner.EOL:\n")
-         DFA.gen.write("            self.line -= 1\n")
-         DFA.gen.write("            self.lineStart = lineStart0\n")
-         DFA.gen.write("         self.pos = self.pos - 2\n")
-         DFA.gen.write("         self.buffer.setPos(self.pos+1)\n")
-         DFA.gen.write("         self.NextCh()\n")
-         DFA.gen.write("      return False\n")
+         __class__.gen.write("      self.NextCh()\n")
+         __class__.gen.write("      if " + __class__.ChCond(com.start[1]) + ":\n")
+         __class__.gen.write("         self.NextCh()\n")
+         __class__.GenComBody3(com)
+         __class__.gen.write("      else:\n")
+         __class__.gen.write("         if self.ch == Scanner.EOL:\n")
+         __class__.gen.write("            self.line -= 1\n")
+         __class__.gen.write("            self.lineStart = lineStart0\n")
+         __class__.gen.write("         self.pos = self.pos - 2\n")
+         __class__.gen.write("         self.buffer.setPos(self.pos+1)\n")
+         __class__.gen.write("         self.NextCh()\n")
+         __class__.gen.write("      return False\n")
 
    @staticmethod
    def CopyFramePart(stop):
@@ -2172,38 +2173,38 @@ class DFA( object ):
       last = 0;   # int
       startCh = stop[0]
       endOfStopString = len(stop) - 1
-      ch = DFA.framRead()   # int
+      ch = __class__.framRead()   # int
 
-      while ch != DFA.EOF:
+      while ch != __class__.EOF:
          if ch == startCh:
             i = 0
             if i == endOfStopString:
                return       # stop[0..i] found
-            ch = DFA.framRead()
+            ch = __class__.framRead()
             i += 1
             while ch == stop[i]:
                if (i == endOfStopString):
                   return    # stop[0..i] found
-               ch = DFA.framRead()
+               ch = __class__.framRead()
                i += 1
             # stop
-            DFA.gen.write(stop[0:1])
-         elif ch == DFA.LF:
-            if last != DFA.CR:
-               DFA.gen.write('\n')
+            __class__.gen.write(stop[0:1])
+         elif ch == __class__.LF:
+            if last != __class__.CR:
+               __class__.gen.write('\n')
             last = ch
-            ch = DFA.framRead()
-         elif (ch == DFA.CR):
-            DFA.gen.write('\n')
+            ch = __class__.framRead()
+         elif (ch == __class__.CR):
+            __class__.gen.write('\n')
             last = ch
-            ch = DFA.framRead()
+            ch = __class__.framRead()
          else:
             if isinstance(chr, int):
-               DFA.gen.write(chr(ch))
+               __class__.gen.write(chr(ch))
             else:
-               DFA.gen.write(ch)
+               __class__.gen.write(ch)
             last = ch
-            ch = DFA.framRead()
+            ch = __class__.framRead()
       raise RuntimeError(" -- incomplete or corrupt scanner frame file")
 
    @staticmethod
@@ -2218,98 +2219,98 @@ class DFA( object ):
 
    @staticmethod
    def GenLiterals( ):
-      DFA.gen.write("lit = self.t.val")
-      if (DFA.ignoreCase):
-         DFA.gen.write(".lower()")
-      DFA.gen.write( '\n' )
+      __class__.gen.write("lit = self.t.val")
+      if (__class__.ignoreCase):
+         __class__.gen.write(".lower()")
+      __class__.gen.write( '\n' )
       first = True   # boolean
       for sym in Symbol.terminals:
          if (sym.tokenKind == Symbol.litToken):
-            name = DFA.SymName(sym)   # String
-            if DFA.ignoreCase:
+            name = __class__.SymName(sym)   # String
+            if __class__.ignoreCase:
                name = name.lower()
             # sym.name stores literals with quotes, e.g. "\"Literal\"",
             if (first):
-               DFA.gen.write("      if ")
+               __class__.gen.write("      if ")
                first = False
             else:
-               DFA.gen.write("      elif ")
-            DFA.gen.write  ("lit == " + name + ":\n")
-            DFA.gen.write  ("         self.t.kind = ")
-            DFA.PrintTermName(sym)
-            DFA.gen.write  ( '\n' )
+               __class__.gen.write("      elif ")
+            __class__.gen.write  ("lit == " + name + ":\n")
+            __class__.gen.write  ("         self.t.kind = ")
+            __class__.PrintTermName(sym)
+            __class__.gen.write  ( '\n' )
 
    @staticmethod
    def WriteState( state):
       assert isinstance(state,State)
       endOf = state.endOf   # Symbol
-      DFA.gen.write(str(state.nr) + ":\n")
+      __class__.gen.write(str(state.nr) + ":\n")
       ctxEnd = state.ctx    # boolean
       action = state.firstAction
       while action is not None:
          if action == state.firstAction:
-            DFA.gen.write  ("            if ")
+            __class__.gen.write  ("            if ")
          else:
-            DFA.gen.write  ("            elif ")
+            __class__.gen.write  ("            elif ")
          if (action.typ == Node.chr):
-            DFA.gen.write  (DFA.ChCond(action.sym))
+            __class__.gen.write  (__class__.ChCond(action.sym))
          else:
-            DFA.PutRange(CharClass.Set(action.sym))
-         DFA.gen.write     (":\n")
+            __class__.PutRange(CharClass.Set(action.sym))
+         __class__.gen.write     (":\n")
          if action.tc == Node.contextTrans:
-            DFA.gen.write  ("               apx += 1\n")
+            __class__.gen.write  ("               apx += 1\n")
             ctxEnd = False
          elif (state.ctx):
-            DFA.gen.write  ("               apx = 0\n")
-         if DFA.ignoreCase:
-            DFA.gen.write  ("               buf += str(self.ch)\n")
+            __class__.gen.write  ("               apx = 0\n")
+         if __class__.ignoreCase:
+            __class__.gen.write  ("               buf += str(self.ch)\n")
          else:
-            DFA.gen.write  ("               buf += str(self.ch)\n")
-         DFA.gen.write     ("               self.NextCh()\n")
-         DFA.gen.write     ("               state = " + str(action.target.state.nr) + '\n')
+            __class__.gen.write  ("               buf += str(self.ch)\n")
+         __class__.gen.write     ("               self.NextCh()\n")
+         __class__.gen.write     ("               state = " + str(action.target.state.nr) + '\n')
          action = action.next
       if state.firstAction is not None:
-         DFA.gen.write     ("            else:\n")
+         __class__.gen.write     ("            else:\n")
       if ctxEnd:       # final context state: cut appendix
-         DFA.gen.write('\n')
-         DFA.gen.write("            self.pos = self.pos - apx - 1\n")
-         DFA.gen.write("            self.line = self.t.line\n")
-         DFA.gen.write("            self.buffer.setPos(self.pos+1)\n")
-         DFA.gen.write("            self.NextCh()\n")
-         #DFA.gen.write("            ")
+         __class__.gen.write('\n')
+         __class__.gen.write("            self.pos = self.pos - apx - 1\n")
+         __class__.gen.write("            self.line = self.t.line\n")
+         __class__.gen.write("            self.buffer.setPos(self.pos+1)\n")
+         __class__.gen.write("            self.NextCh()\n")
+         #__class__.gen.write("            ")
       if state.firstAction is not None:
          if endOf is None:
-            DFA.gen.write("               self.t.kind = Scanner.noSym\n");
-            DFA.gen.write("               done = True\n")
+            __class__.gen.write("               self.t.kind = Scanner.noSym\n");
+            __class__.gen.write("               done = True\n")
          else:
-            DFA.gen.write("               self.t.kind = ")
-            DFA.PrintTermName(endOf)
-            DFA.gen.write( '\n' )
+            __class__.gen.write("               self.t.kind = ")
+            __class__.PrintTermName(endOf)
+            __class__.gen.write( '\n' )
             if endOf.tokenKind == Symbol.classLitToken:
-               DFA.gen.write("               self.t.val = buf\n")
-               DFA.gen.write("               self.CheckLiteral()\n");
-               DFA.gen.write("               return self.t\n");
+               __class__.gen.write("               self.t.val = buf\n")
+               __class__.gen.write("               self.CheckLiteral()\n");
+               __class__.gen.write("               return self.t\n");
             else:
-               DFA.gen.write("               done = True\n")
+               __class__.gen.write("               done = True\n")
       else:
          if endOf is None:
-            DFA.gen.write("            self.t.kind = Scanner.noSym\n")
-            DFA.gen.write("            done = True\n")
+            __class__.gen.write("            self.t.kind = Scanner.noSym\n")
+            __class__.gen.write("            done = True\n")
          else:
-            DFA.gen.write("            self.t.kind = ")
-            DFA.PrintTermName(endOf)
-            DFA.gen.write('\n')
+            __class__.gen.write("            self.t.kind = ")
+            __class__.PrintTermName(endOf)
+            __class__.gen.write('\n')
             if endOf.tokenKind == Symbol.classLitToken:
-               DFA.gen.write("            self.t.val = buf")
-               DFA.gen.write("            self.CheckLiteral()\n")
-               DFA.gen.write("            return self.t\n")
+               __class__.gen.write("            self.t.val = buf")
+               __class__.gen.write("            self.CheckLiteral()\n")
+               __class__.gen.write("            return self.t\n")
             else:
-               DFA.gen.write("            done = True\n")
+               __class__.gen.write("            done = True\n")
 
    @staticmethod
    def FillStartTab(startTab):
       assert isinstance( startTab, list )
-      action = DFA.firstState.firstAction
+      action = __class__.firstState.firstAction
       while action is not None:
          targetState = action.target.state.nr;   # int
          if action.typ == Node.chr:
@@ -2325,12 +2326,12 @@ class DFA( object ):
    def OpenGen(backUp):
       assert isinstance(backUp,bool)
       try:
-         fn = DFA.srcDir + "Scanner.py"   # String
+         fn = os.path.join(__class__.outDir, "Scanner.py")   # String
          if backUp and os.path.exists(fn):
             if os.path.exists(fn + '.old'):
                os.remove( fn + '.old' )
             os.rename( fn, fn + '.old' )
-         DFA.gen = open( fn, 'wt', encoding="utf-8")
+         __class__.gen = open( fn, 'wt', encoding="utf-8")
       except:
          raise RuntimeError("-- Compiler Error: Cannot generate scanner file.")
 
@@ -2338,127 +2339,129 @@ class DFA( object ):
    def WriteScanner( withNames):
       assert isinstance(withNames,bool)
       startTab = [ 0 for i in range(CharClass.charSetSize) ]
-      fr = DFA.srcDir + "Scanner.frame"   # String
+      fr = os.path.join(__class__.srcDir, "Scanner.frame")   # String
       if not os.path.exists( fr ):
          if Tab.frameDir is not None:
             fr = os.path.join( Tab.frameDir.strip(), "Scanner.frame" )
          if not os.path.exists(fr):
             raise RuntimeError("-- Compiler Error: Cannot find Scanner.frame")
       try:
-         DFA.fram = open( fr, 'rt', encoding="utf-8")
+         __class__.fram = open( fr, 'rt', encoding="utf-8")
       except:
          raise RuntimeError("-- Compiler Error: Cannot open Scanner.frame.")
-      DFA.OpenGen(True)
-      if DFA.dirtyDFA:
-         DFA.MakeDeterministic( )
-      DFA.FillStartTab(startTab)
-      DFA.CopyFramePart( "-->begin" )
-      if not DFA.srcName.lower( ).endswith( 'coco.atg' ):
-         DFA.gen.close()
-         DFA.OpenGen(False)
+      __class__.OpenGen(True)
+      if __class__.dirtyDFA:
+         __class__.MakeDeterministic( )
+      __class__.FillStartTab(startTab)
+      __class__.CopyFramePart( "-->begin" )
+      if not __class__.srcName.lower( ).endswith( 'coco.atg' ):
+         __class__.gen.close()
+         __class__.OpenGen(False)
 
-      DFA.CopyFramePart("-->declarations")
-      DFA.gen.write("   charSetSize = " + str(CharClass.charSetSize) + '\n')
-      DFA.gen.write("   maxT = "        + str(len(Symbol.terminals) - 1) + '\n')
-      DFA.gen.write("   noSym = "       + str(Tab.noSym.n) + '\n')
+      __class__.CopyFramePart("-->declarations")
+      __class__.gen.write("   charSetSize = " + str(CharClass.charSetSize) + '\n')
+      __class__.gen.write("   maxT = "        + str(len(Symbol.terminals) - 1) + '\n')
+      __class__.gen.write("   noSym = "       + str(Tab.noSym.n) + '\n')
       if withNames:
-         DFA.gen.write("   # terminals\n")
+         __class__.gen.write("   # terminals\n")
          for sym in Symbol.terminals:
-            DFA.gen.write("   " + sym.symName + " = " + str(sym.n) + '\n')
-         DFA.gen.write("   # pragmas\n")
+            __class__.gen.write("   " + sym.symName + " = " + str(sym.n) + '\n')
+         __class__.gen.write("   # pragmas\n")
          for sym in Symbol.pragmas:
-            DFA.gen.write("   " + sym.symName + " = " + str(sym.n) + '\n')
-         DFA.gen.write( '\n' )
-      DFA.gen.write("   start = [\n")
+            __class__.gen.write("   " + sym.symName + " = " + str(sym.n) + '\n')
+         __class__.gen.write( '\n' )
+      __class__.gen.write("   start = [\n")
       for i in range(0, CharClass.charSetSize // 16):
-         DFA.gen.write("   ")
+         __class__.gen.write("   ")
          for j in range(0, 16):
-            DFA.gen.write(Trace.formatString(str(startTab[16*i+j]), 3))
-            DFA.gen.write(",")
-         DFA.gen.write( '\n' )
-      DFA.gen.write("     -1]\n")
+            __class__.gen.write(Trace.formatString(str(startTab[16*i+j]), 3))
+            __class__.gen.write(",")
+         __class__.gen.write( '\n' )
+      __class__.gen.write("     -1]\n")
 
-      if DFA.ignoreCase:
-         DFA.gen.write("   valCh = ''       # current input character (for token.val)")
+      if __class__.ignoreCase:
+         __class__.gen.write("   valCh = ''       # current input character (for token.val)")
 
-      DFA.CopyFramePart("-->initialization")
+      __class__.CopyFramePart("-->initialization")
       j = 0
       for i in Tab.ignored:
-         DFA.gen.write("      self.ignore.add(" + str(i) + ") \n")
+         __class__.gen.write("      self.ignore.add(" + str(i) + ") \n")
 
-      DFA.CopyFramePart("-->casing")
-      if DFA.ignoreCase:
-         DFA.gen.write("      valCh = self.ch\n")
-         DFA.gen.write("      if self.ch != Buffer.EOF:\n")
-         DFA.gen.write("         self.ch = self.ch.lower()\n");
+      __class__.CopyFramePart("-->casing")
+      if __class__.ignoreCase:
+         __class__.gen.write("      valCh = self.ch\n")
+         __class__.gen.write("      if self.ch != Buffer.EOF:\n")
+         __class__.gen.write("         self.ch = self.ch.lower()\n");
 
-      DFA.CopyFramePart("-->comments")
+      __class__.CopyFramePart("-->comments")
       com = Comment.first   # Comment
       i = 0
       while com is not None:
-         DFA.GenComment(com, i)
+         __class__.GenComment(com, i)
          com = com.next
          i += 1
 
-      DFA.CopyFramePart("-->literals")
-      DFA.GenLiterals()
+      __class__.CopyFramePart("-->literals")
+      __class__.GenLiterals()
 
-      DFA.CopyFramePart("-->scan1")
+      __class__.CopyFramePart("-->scan1")
       if Comment.first!=None:
-         DFA.gen.write("if (")
+         __class__.gen.write("if (")
          com = Comment.first
          i = 0
          while com is not None:
-            DFA.gen.write(DFA.ChCond(com.start[0]))
-            DFA.gen.write(" and self.Comment" + str(i) + "()")
+            __class__.gen.write(__class__.ChCond(com.start[0]))
+            __class__.gen.write(" and self.Comment" + str(i) + "()")
             if com.next is not None:
-               DFA.gen.write(" or ")
+               __class__.gen.write(" or ")
             com = com.next
             i += 1
-         DFA.gen.write("):\n")
-         DFA.gen.write("         return self.NextToken()\n")
-      if DFA.hasCtxMoves:
-         DFA.gen.write('\n')
-         DFA.gen.write("      apx = 0")
+         __class__.gen.write("):\n")
+         __class__.gen.write("         return self.NextToken()\n")
+      if __class__.hasCtxMoves:
+         __class__.gen.write('\n')
+         __class__.gen.write("      apx = 0")
 
-      DFA.CopyFramePart("-->scan2")
-      if DFA.ignoreCase:
-         DFA.gen.write("buf += str(self.ch)\n")
-         DFA.gen.write("      self.NextCh()\n")
+      __class__.CopyFramePart("-->scan2")
+      if __class__.ignoreCase:
+         __class__.gen.write("buf += str(self.ch)\n")
+         __class__.gen.write("      self.NextCh()\n")
       else:
-         DFA.gen.write("buf += str(self.ch)\n")
-         DFA.gen.write("      self.NextCh()\n")
+         __class__.gen.write("buf += str(self.ch)\n")
+         __class__.gen.write("      self.NextCh()\n")
 
-      DFA.CopyFramePart("-->scan3")
-      state = DFA.firstState.next
+      __class__.CopyFramePart("-->scan3")
+      state = __class__.firstState.next
       while state is not None:
-         DFA.gen.write("         elif state == ")
-         DFA.WriteState(state)
+         __class__.gen.write("         elif state == ")
+         __class__.WriteState(state)
          state = state.next
-      DFA.CopyFramePart("$$$")
-      DFA.gen.close()
+      __class__.CopyFramePart("$$$")
+      __class__.gen.close()
 
    @staticmethod
-   def Init ( file,  dir):
-      assert isinstance(file,str)
-      assert isinstance(dir,str)
-      DFA.srcName = file
-      DFA.srcDir = dir
-      DFA.firstState = None
-      DFA.lastState = None
+   def Init ( file:str, srcDir:str, outDir:str):
+      assert isinstance(file, str)
+      assert isinstance(srcDir, str)
+      assert isinstance(outDir, str)
+      __class__.srcName = file
+      __class__.srcDir = srcDir
+      __class__.outDir = outDir
+      __class__.firstState = None
+      __class__.lastState = None
       State.lastNr = -1;
-      DFA.firstState = DFA.NewState()
+      __class__.firstState = __class__.NewState()
       Melted.first = None
       Comment.first = None
-      DFA.ignoreCase = False
-      DFA.dirtyDFA = False
-      DFA.hasCtxMoves = False
+      __class__.ignoreCase = False
+      __class__.dirtyDFA = False
+      __class__.hasCtxMoves = False
 
    @staticmethod
    def PrintTermName( sym):
       assert isinstance(sym,Symbol)
       if sym.symName is None:
-         DFA.gen.write(str(sym.n))
+         __class__.gen.write(str(sym.n))
       else:
-         DFA.gen.write("Scanner.")
-         DFA.gen.write(str(sym.symName))
+         __class__.gen.write("Scanner.")
+         __class__.gen.write(str(sym.symName))

@@ -26,6 +26,7 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 import sys
+import os
 
 class ErrorRec( object ):
    def __init__( self, l, c, s ):
@@ -57,7 +58,7 @@ class Errors( object ):
       Errors.getParsingPos = getParsingPos
       Errors.errorMessages = errorMessages
       Errors.fileName = fn
-      listName = dir + 'listing.txt'
+      listName = os.path.join(dir, 'listing.txt')
       Errors.mergeErrors = merge
       if Errors.mergeErrors:
          try:

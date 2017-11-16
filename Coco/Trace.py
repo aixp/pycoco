@@ -42,7 +42,7 @@ class Trace( object ):
          raise RuntimeError( '-- Compiler Error: could not open ' + Trace.fileName )
 
    @staticmethod
-   def formatString( s, w ):
+   def formatString( s:str, w:int ):
       ''' Returns a string with a minimum length of |w| characters
       the string is left-adjusted if w < 0 and right-adjusted otherwise'''
       assert isinstance( s, str )
@@ -59,7 +59,7 @@ class Trace( object ):
          return s + b
 
    @staticmethod
-   def Write( s, w=None ):
+   def Write( s:str, w:int=None ):
       '''writes a string with a maximum length of |w| characters'''
       assert isinstance( s, str )
       assert isinstance( w, int ) or (w is None)
@@ -69,7 +69,7 @@ class Trace( object ):
          Trace.trace.write( Trace.formatString( s, w ) )
 
    @staticmethod
-   def WriteLine( s=None, w=None ):
+   def WriteLine( s:str=None, w:int=None ):
       assert isinstance( s, str ) or (s is None)
       assert isinstance( w, int ) or (w is None)
       if s is not None:
@@ -88,4 +88,4 @@ class Trace( object ):
          os.remove( Trace.fileName )
       else:
          print()
-         print('trace output is in', Trace.fileName)
+         print('trace output is in', os.path.basename(Trace.fileName))

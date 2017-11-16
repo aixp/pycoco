@@ -8,6 +8,7 @@ import traceback
 import shutil
 from .util import *
 import unittest
+import subprocess
 
 def expandGlob( aPathPattern ):
    '''Given a pathname pattern, return a list of all the paths on
@@ -130,7 +131,7 @@ def assertFilesEqual(test, fn1, fn2 ):
    with open( os.path.normpath(fn2), 'rt', encoding="utf-8") as f:
       f2 = f.read( )
 
-   return test.assertEqual( f1, f2 )
+   return test.assertMultiLineEqual( f1, f2 )
 
 def dos2unix( filename ):
    if isinstance( filename, str ):
@@ -173,7 +174,3 @@ def unix2dos( filename ):
 
 def touch( filename ):
    pass
-
-def shell( *strings ):
-   command = ' '.join( strings )
-   os.system( command )

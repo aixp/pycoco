@@ -77,6 +77,13 @@ class CocoArgs(ApplicationWithArgsParsing):
       help='Include a cross reference listing in the trace file.'
    )
    
+   outputDir=plumbum.cli.SwitchAttr(
+      ('-O', "outputDir"),
+      plumbum.cli.ExistingDirectory,
+      default=False,
+      help='Output files to that directory.'
+   )
+   
    def main(self, *args, **kwargs):
       return self
 

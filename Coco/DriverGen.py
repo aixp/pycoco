@@ -38,6 +38,7 @@ class DriverGen( object ):
 
    srcName        =  ''         # name of the attributed grammar file
    srcDir         =  ''         # directory of attributed grammar file
+   outDir         =  ''         # directory of attributed grammar file
    
    codeGen        = CodeGenerator( )
 
@@ -52,11 +53,12 @@ class DriverGen( object ):
       #DriverGen.codeGen.write( Tab.gramSy.name )
       DriverGen.codeGen.CopyFramePart( '$$$' )
       DriverGen.codeGen.close( )
-      os.chmod(fn, 0o755)
+      os.chmod(os.path.join( __class__.outDir, fn ), 0o755)
 
    @staticmethod
-   def Init( f, dir ):
+   def Init( f, dir, outDir):
       assert isinstance( f, str )
       assert isinstance( dir, str )
       DriverGen.srcName = f
       DriverGen.srcDir  = dir
+      DriverGen.outDir  = outDir
