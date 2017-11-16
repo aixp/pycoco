@@ -26,16 +26,11 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 
-from Errors import Errors
-from CharClass import CharClass
-from Core import Node
-from Core import DFA
-from Core import Graph
-from Core import Symbol
-from Core import Tab
-from Core import Comment
-from DriverGen import DriverGen
-from ParserGen import ParserGen
+from .Errors import Errors
+from .CharClass import CharClass
+from .Core import Node, DFA, Graph, Symbol, Tab, Comment
+from .DriverGen import DriverGen
+from .ParserGen import ParserGen
 
 COMPILER Coco
 
@@ -208,7 +203,7 @@ SimSet<out s>                   (. n1 = 0
                                    else:
                                       s |= c.set      .)
 | String<out name>
-  (                             (. for i in xrange( 0, len(name) ):
+  (                             (. for i in range( 0, len(name) ):
                                       if DFA.ignoreCase:
                                          s.add(ord(name[i].lower()))
                                       else:
@@ -227,7 +222,7 @@ SimSet<out s>                   (. n1 = 0
                                    if DFA.ignoreCase and ((n2 >= ord('A')) and (n2 <= ord('Z'))):
                                       n2 += 32 .)
         | SingleChar<out n2, mx>
-      )                         (. for i in xrange( n1, n2+1 ):
+      )                         (. for i in range( n1, n2+1 ):
                                       s.add(i)    .)
   )
 | SingleChar<out n1, mx>       (. s.add(n1) .)
@@ -239,12 +234,12 @@ SimSet<out s>                   (. n1 = 0
                                    if DFA.ignoreCase and ((n2 >= ord('A')) and (n2 <= ord('Z'))):
                                       n2 += 32  .)
         | SingleChar<out n2, mx>
-      )                         (. for i in xrange( n1, n2 ):
+      )                         (. for i in range( n1, n2 ):
                                       s.add(i)                 .)
     ]
 
 | "ANY"                         (. s = set( )
-                                   for num in xrange( 0, CharClass.charSetSize ):
+                                   for num in range( 0, CharClass.charSetSize ):
                                       s.add(num)
                                    s.add('ANYCHAR')              .)
 )

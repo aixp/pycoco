@@ -28,7 +28,7 @@
 import copy
 import os
 import os.path
-import StringIO
+import io
 
 from .Errors import Errors
 from .Trace import Trace
@@ -62,7 +62,7 @@ class ParserGen( object ):
       assert isinstance( s1, set )
       assert isinstance( s2, set )
       ln = len(s1)
-      for i in xrange( 0, ln ):
+      for i in range( 0, ln ):
          if (i in s1) and (i in s2):
             return True
       return False
@@ -87,7 +87,7 @@ class ParserGen( object ):
    @staticmethod
    def NewCondSet( s ):
       assert isinstance( s, set )
-      for i in xrange( 1, len(ParserGen.symSet) ):
+      for i in range( 1, len(ParserGen.symSet) ):
         # skip symSet[0] (reserved for union of SYNC sets)
         if s == ParserGen.symSet[i]: #s.equals( ParserGen.symSet[i] ):
            return i
@@ -105,7 +105,7 @@ class ParserGen( object ):
          if n == 0:
             ParserGen.codeGen.write( 'False' ) # should never happen
          elif n <= ParserGen.maxTerm:
-            for i in xrange( 0, len(Symbol.terminals) ):
+            for i in range( 0, len(Symbol.terminals) ):
                sym = Symbol.terminals[i]
                assert isinstance( sym, Symbol )
                if sym.n in s:
@@ -224,7 +224,7 @@ class ParserGen( object ):
             ParserGen.GenCode( p.sub, indent+1, s1 )
 
          if p.typ != Node.eps and p.typ != Node.sem and p.typ != Node.sync:
-            for val in xrange( 0, len(isChecked) ):
+            for val in range( 0, len(isChecked) ):
                isChecked.discard( val )
 
          if p.up:
@@ -283,7 +283,7 @@ class ParserGen( object ):
 
    @staticmethod
    def InitSets( ):
-      for i in xrange(0,len(ParserGen.symSet)):
+      for i in range(0,len(ParserGen.symSet)):
          s = ParserGen.symSet[i]
          ParserGen.codeGen.write( '      [' )
          j = 0
@@ -321,7 +321,7 @@ class ParserGen( object ):
       if withNames:
          Tab.AssignNames( )
 
-      ParserGen.err = StringIO.StringIO( )
+      ParserGen.err = io.StringIO( )
       for sym in Symbol.terminals:
          ParserGen.GenErrorMsg( ParserGen.tErr, sym )
 
@@ -366,7 +366,7 @@ class ParserGen( object ):
    @staticmethod
    def PrintTermName( sym ):
       assert isinstance( sym, Symbol )
-      assert isinstance( sym.symName, (str,unicode) ) or (sym.symName is None)
+      assert isinstance( sym.symName, str ) or (sym.symName is None)
       if sym.symName is None:
          ParserGen.codeGen.write( str(sym.n) )
       else:

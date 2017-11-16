@@ -27,7 +27,7 @@ class CodeGenerator( object ):
             if CodeGenerator.frameDir is not None:
                fr = os.path.join( CodeGenerator.frameDir, frameName )
          try:
-            self._frameFile = file( fr, 'r' )
+            self._frameFile = open( fr, 'rt', encoding="utf-8")
             break
          except IOError:
             pass
@@ -42,7 +42,7 @@ class CodeGenerator( object ):
             if os.path.exists( fn + '.old' ):
                os.remove( fn + '.old' )
             os.rename( fn, fn + '.old' )
-         self._outputFile = file( fn, 'w' )
+         self._outputFile = open( fn, 'wt', encoding="utf-8")
       except:
          raise RuntimeError( '-- Compiler Error: Cannot create ' + outputFileName[0] + '.py' )
 
@@ -142,7 +142,7 @@ class CodeGenerator( object ):
          return "ord('" + ch + "')"
 
    def ReportCh(self, ch):
-      if isinstance(ch, (str,unicode)):
+      if isinstance(ch, str):
          ch = ord(ch)
       if (ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\')):
          return str(ch)
@@ -150,7 +150,7 @@ class CodeGenerator( object ):
          return ''.join( [ "'", chr(ch), "'" ] )
 
    def ChCond(self, ch, relOpStr='=='):
-      if isinstance(ch, (str,unicode)):
+      if isinstance(ch, str):
          ch = ord(ch)
 
       if (ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\')):

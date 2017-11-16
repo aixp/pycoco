@@ -1,5 +1,5 @@
 from distutils.core import setup
 
-from setupInfo import MetaData
+from Coco.setupInfo import MetaData
 
 setup( **MetaData )

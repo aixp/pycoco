@@ -7,7 +7,7 @@ class Token( object ):
       self.pos    = 0     # token position in the source text (starting at 0)
       self.col    = 0     # token column (starting at 0)
       self.line   = 0     # token line (starting at 1)
-      self.val    = u''   # token value
+      self.val    = ''   # token value
       self.next   = None  # AW 2003-03-07 Tokens are kept in linked list
 
 
@@ -27,7 +27,7 @@ class Position( object ):    # position of source code stretch (e.g. semantic ac
       return self.buf.readPosition( self )
 
 class Buffer( object ):
-   EOF      = u'\u0100'     # 256
+   EOF      = '\u0100'     # 256
 
    def __init__( self, s ):
       self.buf    = s
@@ -84,7 +84,7 @@ class Buffer( object ):
       return iter(self.lines)
 
 class Scanner(object):
-   EOL     = u'\n'
+   EOL     = '\n'
    eofSym  = 0
 
    charSetSize = 256
@@ -111,9 +111,9 @@ class Scanner(object):
 
 
    def __init__( self, s ):
-      self.buffer = Buffer( unicode(s) ) # the buffer instance
+      self.buffer = Buffer( str(s) ) # the buffer instance
 
-      self.ch        = u'\0'       # current input character
+      self.ch        = '\0'       # current input character
       self.pos       = -1          # column number of current character
       self.line      = 1           # line number of current character
       self.lineStart = 0           # start position of current line
@@ -133,7 +133,7 @@ class Scanner(object):
          node = node.next
 
       node.next = node
-      node.val  = u'EOF'
+      node.val  = 'EOF'
       self.t  = self.tokens     # current token
       self.pt = self.tokens     # current peek token
 
@@ -146,7 +146,7 @@ class Scanner(object):
          self.pos += 1
          # replace isolated '\r' by '\n' in order to make
          # eol handling uniform across Windows, Unix and Mac
-         if (self.ch == u'\r') and (self.buffer.Peek() != u'\n'):
+         if (self.ch == '\r') and (self.buffer.Peek() != '\n'):
             self.ch = Scanner.EOL
          if self.ch == Scanner.EOL:
             self.line += 1
@@ -172,8 +172,8 @@ class Scanner(object):
          state = self.start[ord(self.ch)]
       else:
          state = 0
-      buf = u''
-      buf += unicode(self.ch)
+      buf = ''
+      buf += str(self.ch)
       self.NextCh()
 
       done = False

@@ -83,7 +83,7 @@ class Symbol( object ):
 
    def __init__( self, typ, name, line ):
       assert isinstance( typ, int )
-      assert isinstance( name, (str,unicode) )
+      assert isinstance( name, str )
       assert isinstance( line, int )
       self.n             = 0       # symbol number
       self.typ           = 0       # t, nt, pr, unknown, rslv
@@ -122,7 +122,7 @@ class Symbol( object ):
 
    @staticmethod
    def Find( name ):
-      assert isinstance( name, ( str, unicode ) )
+      assert isinstance( name, str )
 
       for s in Symbol.terminals:
          if s.name == name:
@@ -256,7 +256,7 @@ class Node( object ):
 
    @staticmethod
    def Name( name ):
-      assert isinstance( name, (str,unicode) )
+      assert isinstance( name, str )
       return (name + '           ')[0:12]
       # found no simpler way to get the first 12 characters of the name
       # padded with blanks on the right
@@ -354,8 +354,8 @@ class State( object ):
             lasta.next = a.next
 
    def TheAction(self, ch):
-      assert isinstance(ch,(str,unicode))
-      if isinstance( ch, (str,unicode) ):
+      assert isinstance(ch,str)
+      if isinstance( ch, str ):
          ch = ord(ch)
       a = self.firstAction
       while a is not None:
@@ -451,13 +451,13 @@ class Action( object ):
             try:
                targets |= Melted.Set(stateNr)
             except:
-               print sys.exc_info()[1]
+               print(sys.exc_info()[1])
                Errors.count += 1
          if t.state.endOf is not None:
             if (endOf is None) or (endOf == t.state.endOf):
                endOf = t.state.endOf
             else:
-               print "Tokens " + endOf.name + " and " + t.state.endOf.name + " cannot be distinguished"
+               print("Tokens " + endOf.name + " and " + t.state.endOf.name + " cannot be distinguished")
                Errors.count += 1
          if t.state.ctx:
             ctx = True
@@ -595,13 +595,13 @@ class Graph( object ):
 
    @staticmethod
    def StrToGraph( st ):
-      assert isinstance(st,(str,unicode))
+      assert isinstance(st,str)
       s = DFA.Unescape(st[1:-1])
       if len(s) == 0:
          Errors.SemErr("empty token not allowed")
       g = Graph()
       g.r = Graph.dummyNode
-      for i in xrange(0, len(s)):
+      for i in range(0, len(s)):
          p = Node(Node.chr, ord(s[i]), 0)
          g.r.next = p
          g.r = p
@@ -898,7 +898,7 @@ class Tab:
       for p in Node.nodes:
          if p.typ == Node.any:
             p.set = set( )
-            for j in xrange(0,len(Symbol.terminals)):
+            for j in range(0,len(Symbol.terminals)):
                p.set.add(j)
             p.set.discard(Tab.eofSy.n)
 
@@ -919,7 +919,7 @@ class Tab:
                changed = True
       for sym in nt:
          if sym.deletable:
-            print "  " + sym.name + " deletable"
+            print("  " + sym.name + " deletable")
 
    @staticmethod
    def RenumberPragmas():
@@ -1008,7 +1008,7 @@ class Tab:
       for sym in Symbol.nonterminals:
          singles = [ ]
          Tab.GetSingles(sym.graph, singles) # get nonterminals s such that sym-->s
-         for j in xrange( 0, len(singles) ):
+         for j in range( 0, len(singles) ):
             s = singles[j]
             lst.append( CNode(sym, s) )
 
@@ -1051,7 +1051,7 @@ class Tab:
       for n in lst:
          ok = False;
          Errors.count += 1
-         print "  " + n.left.name + " --> " + n.right.name
+         print("  " + n.left.name + " --> " + n.right.name)
       return ok
 
    #--------------- check for LL(1) errors ----------------------
@@ -1060,17 +1060,17 @@ class Tab:
    def LL1Error( cond, sym):
       assert isinstance(cond,int)
       assert isinstance(sym,Symbol) or (sym is None)
-      print "  LL(1) warning in " + Tab.curSy.name + ":",
+      print("  LL(1) warning in " + Tab.curSy.name + ":", end=' ')
       if sym is not None:
-         print sym.name + " is",
+         print(sym.name + " is", end=' ')
       if cond == 1:
-         print "the start of several alternatives"
+         print("the start of several alternatives")
       elif cond == 2:
-         print "the start & successor of a deletable structure"
+         print("the start & successor of a deletable structure")
       elif cond == 3:
-         print "an ANY node that matches no symbol"
+         print("an ANY node that matches no symbol")
       elif cond == 4:
-         print "contents of [...] or {...} must not be deletable"
+         print("contents of [...] or {...} must not be deletable")
 
    @staticmethod
    def CheckOverlap( s1, s2, cond ):
@@ -1185,7 +1185,7 @@ class Tab:
          if sym.graph is None:
             complete = False
             Errors.count += 1
-            print "  No production for " + sym.name
+            print("  No production for " + sym.name)
       return complete
 
    #-------------- check if every nts can be reached  -----------------
@@ -1215,7 +1215,7 @@ class Tab:
          if sym.n not in Tab.visited:
             ok = False
             Errors.count += 1
-            print "  " + sym.name + " cannot be reached"
+            print("  " + sym.name + " cannot be reached")
       return ok
 
    #--------- check if every nts can be derived to terminals  ------------
@@ -1259,7 +1259,7 @@ class Tab:
          if sym.n not in mark:
             ok = False
             Errors.count += 1
-            print "  " + sym.name + " cannot be derived to terminals"
+            print("  " + sym.name + " cannot be derived to terminals")
       return ok
 
    #---------------------------------------------------------------------
@@ -1337,7 +1337,7 @@ class Tab:
       Trace.WriteLine()
       Trace.WriteLine("Literal Tokens:")
       Trace.WriteLine("--------------")
-      for me_key, me_value in Tab.literals.iteritems():
+      for me_key, me_value in Tab.literals.items():
          Trace.WriteLine("_" + me_value.name + " = " + me_key + ".");
       Trace.WriteLine()
 
@@ -1366,10 +1366,10 @@ class Tab:
       Trace.WriteLine("Cross reference list:")
       Trace.WriteLine("--------------------")
       Trace.WriteLine( )
-      keyList = [ x.name for x in tab.keys() ]
+      keyList = [ x.name for x in list(tab.keys()) ]
       keyList.sort( )
       for key in keyList:
-         for k in tab.keys( ):
+         for k in list(tab.keys( )):
             if k.name == key:
                sym = k
                break
@@ -1381,7 +1381,7 @@ class Tab:
          for line in lst:
             if col + 5 > 80:
                Trace.WriteLine()
-               for col in xrange(1,15):
+               for col in range(1,15):
                   Trace.Write(" ");
             Trace.Write(str(line), 5)
             col += 5
@@ -1403,7 +1403,7 @@ class Tab:
                   'symbolTable':        6,
                   'testOnly':           9,
                   'crossReferences':    7 }
-      for key,value in options.iteritems( ):
+      for key,value in options.items( ):
          if s.__dict__[ key ]:
             Tab.ddt[ value ] = True
 
@@ -1424,7 +1424,7 @@ class Tab:
 
    @staticmethod
    def Ascii(ch):
-      assert isinstance(ch, (str,unicode))
+      assert isinstance(ch, str)
       name = {
           chr( 0) : "nul",
           chr( 1) : "soh",
@@ -1509,7 +1509,7 @@ class Tab:
 
    @staticmethod
    def SymName(name):
-      assert isinstance( name, (str,unicode) )
+      assert isinstance( name, str )
       name = str(name)
       for u in UserDefinedTokenName.NameTab:
          if name == u.name:
@@ -1517,7 +1517,7 @@ class Tab:
       if name[0] == '"':
          name = DFA.Unescape(name[1:-1])
       S = ''
-      for i in xrange(0,len(name)):
+      for i in range(0,len(name)):
          ch = name[i]
          if ('a' <= ch <= 'z' or 'A' <= ch <= 'Z'
                or '0' <= ch <= '9' and i > 0):
@@ -1582,7 +1582,7 @@ class DFA( object ):
 
    @staticmethod
    def ReportCh(ch):
-      if isinstance(ch, (str,unicode)):
+      if isinstance(ch, str):
          ch = ord(ch)
       if (ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\')):
          return str(ch)
@@ -1591,7 +1591,7 @@ class DFA( object ):
 
    @staticmethod
    def ChCond(ch, relOpStr='=='):
-      if isinstance(ch, (str,unicode)):
+      if isinstance(ch, str):
          ch = ord(ch)
 
       if (ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\')):
@@ -1628,7 +1628,7 @@ class DFA( object ):
       else:
          DFA.gen.write("(")
 
-         for i in xrange( 0, top+1 ):
+         for i in range( 0, top+1 ):
             if hi[i] == lo[i]:
                DFA.gen.write( DFA.ChCond( lo[i] ) )
             elif (lo[i] == 0):
@@ -1646,9 +1646,9 @@ class DFA( object ):
         #---------- String handling
    @staticmethod
    def Hex2Char(s):
-      assert isinstance( s, (str,unicode) )
+      assert isinstance( s, str )
       val = 0   # int
-      for i in xrange(0,len(s)):
+      for i in range(0,len(s)):
          ch = s[i]               # char
          if '0' <= ch <= '9':
             val = 16 * val + (ord(ch) - ord('0'))
@@ -1664,16 +1664,16 @@ class DFA( object ):
 
    @staticmethod
    def Char2Hex( ch):
-      assert isinstance(ch,(str,unicode))
+      assert isinstance(ch,str)
       hx = hex(ord(ch))
-      for i in xrange(len(hx), 4):
+      for i in range(len(hx), 4):
          hx = '0' + hx;
       return "\\u" + hx;
 
    @staticmethod
    def Unescape (s):
       # replaces escape sequences in s by their Unicode values.
-      assert isinstance( s, (str,unicode) )
+      assert isinstance( s, str )
       buf = ''
       i = 0
       while i < len(s):
@@ -1708,7 +1708,7 @@ class DFA( object ):
 
    @staticmethod
    def Escape(s):
-      assert isinstance(s, (str,unicode))
+      assert isinstance(s, str)
       buf = ''
       for ch in s:
          if ch in ('\\', '\'', '\"', '\t', '\r', '\n'):
@@ -1740,11 +1740,11 @@ class DFA( object ):
       assert isinstance(frm,State)
       assert isinstance(to,State)
       assert isinstance(typ,int)
-      assert isinstance(sym,(int,str,unicode))
+      assert isinstance(sym,(int,str))
       assert isinstance(tc,int)
       if to == DFA.firstState:
          Errors.SemErr("token must not start with an iteration")
-      if isinstance(sym, (str,unicode)):
+      if isinstance(sym, str):
          sym = ord(sym)
       t = Target(to)
       a = Action(typ, sym, tc)
@@ -1788,7 +1788,7 @@ class DFA( object ):
 
    @staticmethod
    def DeleteRedundantStates():
-      newState = [ None for x in xrange(State.lastNr + 1) ]
+      newState = [ None for x in range(State.lastNr + 1) ]
       used = set( )
       DFA.FindUsedStates(DFA.firstState, used)
       # combine equal final states
@@ -1921,7 +1921,7 @@ class DFA( object ):
    @staticmethod
    def MatchLiteral(s, sym):
       assert isinstance(sym,Symbol)
-      assert isinstance(s,(str,unicode))
+      assert isinstance(s,str)
       '''match string against current automaton; store it either as a
       fixedToken or as a litToken'''
       s = DFA.Unescape(s[1:-1])
@@ -1929,7 +1929,7 @@ class DFA( object ):
       state = DFA.firstState   # State
       a = None
       endedPrematurely = False
-      for i in xrange(0, ln):    # try to match s against existing DFA
+      for i in range(0, ln):    # try to match s against existing DFA
          a = state.TheAction(s[i])
          if a is None:
             endedPrematurely = True
@@ -2226,7 +2226,7 @@ class DFA( object ):
 
    @staticmethod
    def CopyFramePart(stop):
-      assert isinstance(stop,(str,unicode))
+      assert isinstance(stop,str)
       last = 0;   # int
       startCh = stop[0]
       endOfStopString = len(stop) - 1
@@ -2269,7 +2269,7 @@ class DFA( object ):
       assert isinstance(sym,Symbol)
       if sym.name[0].isalpha( ):
          # real name value is stored in Tab.literals
-         for me_key, me_value in Tab.literals.iteritems( ):
+         for me_key, me_value in Tab.literals.items( ):
             if me_value == sym:
                return me_key
       return sym.name
@@ -2320,9 +2320,9 @@ class DFA( object ):
          elif (state.ctx):
             DFA.gen.write  ("               apx = 0\n")
          if DFA.ignoreCase:
-            DFA.gen.write  ("               buf += unicode(self.ch)\n")
+            DFA.gen.write  ("               buf += str(self.ch)\n")
          else:
-            DFA.gen.write  ("               buf += unicode(self.ch)\n")
+            DFA.gen.write  ("               buf += str(self.ch)\n")
          DFA.gen.write     ("               self.NextCh()\n")
          DFA.gen.write     ("               state = " + str(action.target.state.nr) + '\n')
          action = action.next
@@ -2374,7 +2374,7 @@ class DFA( object ):
             startTab[action.sym] = targetState
          else:
             s = CharClass.Set(action.sym)   # BitSet
-            for i in xrange( 0, CharClass.charSetSize ):
+            for i in range( 0, CharClass.charSetSize ):
                if i in s:
                   startTab[i] = targetState
          action = action.next
@@ -2388,14 +2388,14 @@ class DFA( object ):
             if os.path.exists(fn + '.old'):
                os.remove( fn + '.old' )
             os.rename( fn, fn + '.old' )
-         DFA.gen = file( fn, 'w' )
+         DFA.gen = open( fn, 'wt', encoding="utf-8")
       except:
          raise RuntimeError("-- Compiler Error: Cannot generate scanner file.")
 
    @staticmethod
    def WriteScanner( withNames):
       assert isinstance(withNames,bool)
-      startTab = [ 0 for i in xrange(CharClass.charSetSize) ]
+      startTab = [ 0 for i in range(CharClass.charSetSize) ]
       fr = DFA.srcDir + "Scanner.frame"   # String
       if not os.path.exists( fr ):
          if Tab.frameDir is not None:
@@ -2403,7 +2403,7 @@ class DFA( object ):
          if not os.path.exists(fr):
             raise RuntimeError("-- Compiler Error: Cannot find Scanner.frame")
       try:
-         DFA.fram = file( fr, 'r' )
+         DFA.fram = open( fr, 'rt', encoding="utf-8")
       except:
          raise RuntimeError("-- Compiler Error: Cannot open Scanner.frame.")
       DFA.OpenGen(True)
@@ -2428,16 +2428,16 @@ class DFA( object ):
             DFA.gen.write("   " + sym.symName + " = " + str(sym.n) + '\n')
          DFA.gen.write( '\n' )
       DFA.gen.write("   start = [\n")
-      for i in xrange(0,CharClass.charSetSize / 16):
+      for i in range(0, CharClass.charSetSize // 16):
          DFA.gen.write("   ")
-         for j in xrange(0,16):
+         for j in range(0, 16):
             DFA.gen.write(Trace.formatString(str(startTab[16*i+j]), 3))
             DFA.gen.write(",")
          DFA.gen.write( '\n' )
       DFA.gen.write("     -1]\n")
 
       if DFA.ignoreCase:
-         DFA.gen.write("   valCh = u''       # current input character (for token.val)")
+         DFA.gen.write("   valCh = ''       # current input character (for token.val)")
 
       DFA.CopyFramePart("-->initialization")
       j = 0
@@ -2481,10 +2481,10 @@ class DFA( object ):
 
       DFA.CopyFramePart("-->scan2")
       if DFA.ignoreCase:
-         DFA.gen.write("buf += unicode(self.ch)\n")
+         DFA.gen.write("buf += str(self.ch)\n")
          DFA.gen.write("      self.NextCh()\n")
       else:
-         DFA.gen.write("buf += unicode(self.ch)\n")
+         DFA.gen.write("buf += str(self.ch)\n")
          DFA.gen.write("      self.NextCh()\n")
 
       DFA.CopyFramePart("-->scan3")

@@ -34,7 +34,7 @@ class Token( object ):
       self.pos    = 0     # token position in the source text (starting at 0)
       self.col    = 0     # token column (starting at 0)
       self.line   = 0     # token line (starting at 1)
-      self.val    = u''   # token value
+      self.val    = ''   # token value
       self.next   = None  # AW 2003-03-07 Tokens are kept in linked list
 
 
@@ -54,7 +54,7 @@ class Position( object ):    # position of source code stretch (e.g. semantic ac
       return self.buf.readPosition( self )
 
 class Buffer( object ):
-   EOF      = u'\u0100'     # 256
+   EOF      = '\u0100'     # 256
 
    def __init__( self, s ):
       self.buf    = s
@@ -64,7 +64,7 @@ class Buffer( object ):
 
    def Read( self ):
       if self.pos < self.bufLen:
-         result = unichr(ord(self.buf[self.pos]) & 0xff)   # mask out sign bits
+         result = chr(ord(self.buf[self.pos]) & 0xff)   # mask out sign bits
          self.pos += 1
          return result
       else:
@@ -77,7 +77,7 @@ class Buffer( object ):
 
    def Peek( self ):
       if self.pos < self.bufLen:
-         return unichr(ord(self.buf[self.pos]) & 0xff)    # mask out sign bits
+         return chr(ord(self.buf[self.pos]) & 0xff)    # mask out sign bits
       else:
          return Scanner.buffer.EOF
 
@@ -111,7 +111,7 @@ class Buffer( object ):
       return iter(self.lines)
 
 class Scanner(object):
-   EOL     = u'\n'
+   EOL     = '\n'
    eofSym  = 0
 
    charSetSize = 256
@@ -191,9 +191,9 @@ class Scanner(object):
 
 
    def __init__( self, s ):
-      self.buffer = Buffer( unicode(s) ) # the buffer instance
+      self.buffer = Buffer( str(s) ) # the buffer instance
 
-      self.ch        = u'\0'       # current input character
+      self.ch        = '\0'       # current input character
       self.pos       = -1          # column number of current character
       self.line      = 1           # line number of current character
       self.lineStart = 0           # start position of current line
@@ -216,7 +216,7 @@ class Scanner(object):
          node = node.next
 
       node.next = node
-      node.val  = u'EOF'
+      node.val  = 'EOF'
       self.t  = self.tokens     # current token
       self.pt = self.tokens     # current peek token
 
@@ -229,7 +229,7 @@ class Scanner(object):
          self.pos += 1
          # replace isolated '\r' by '\n' in order to make
          # eol handling uniform across Windows, Unix and Mac
-         if (self.ch == u'\r') and (self.buffer.Peek() != u'\n'):
+         if (self.ch == '\r') and (self.buffer.Peek() != '\n'):
             self.ch = Scanner.EOL
          if self.ch == Scanner.EOL:
             self.line += 1
@@ -361,8 +361,8 @@ class Scanner(object):
       self.t.col = self.pos - self.lineStart + 1
       self.t.line = self.line
       state = self.start[ord(self.ch)]
-      buf = u''
-      buf += unicode(self.ch)
+      buf = ''
+      buf += str(self.ch)
       self.NextCh()
 
       done = False
@@ -377,7 +377,7 @@ class Scanner(object):
             if (self.ch >= '0' and self.ch <= '9'
                  or self.ch >= 'A' and self.ch <= 'Z'
                  or self.ch >= 'a' and self.ch <= 'z'):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 1
             else:
@@ -387,7 +387,7 @@ class Scanner(object):
                return self.t
          elif state == 2:
             if (self.ch >= '0' and self.ch <= '9'):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 2
             else:
@@ -403,7 +403,7 @@ class Scanner(object):
             if (self.ch >= '0' and self.ch <= '9'
                  or self.ch >= 'A' and self.ch <= 'Z'
                  or self.ch >= 'a' and self.ch <= 'z'):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 5
             else:
@@ -415,20 +415,20 @@ class Scanner(object):
                  or ord(self.ch) >= 14 and self.ch <= '!'
                  or self.ch >= '#' and self.ch <= '['
                  or self.ch >= ']' and ord(self.ch) <= 255):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 6
             elif (ord(self.ch) == 10
                  or ord(self.ch) == 13):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 4
             elif self.ch == '"':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 3
             elif ord(self.ch) == 92:
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 8
             else:
@@ -440,20 +440,20 @@ class Scanner(object):
                  or ord(self.ch) >= 14 and self.ch <= '&'
                  or self.ch >= '(' and self.ch <= '['
                  or self.ch >= ']' and ord(self.ch) <= 255):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 7
             elif (ord(self.ch) == 10
                  or ord(self.ch) == 13):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 4
             elif ord(self.ch) == 39:
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 3
             elif ord(self.ch) == 92:
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 9
             else:
@@ -461,7 +461,7 @@ class Scanner(object):
                done = True
          elif state == 8:
             if (self.ch >= ' ' and self.ch <= '~'):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 6
             else:
@@ -469,7 +469,7 @@ class Scanner(object):
                done = True
          elif state == 9:
             if (self.ch >= ' ' and self.ch <= '~'):
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 7
             else:
@@ -531,15 +531,15 @@ class Scanner(object):
             done = True
          elif state == 28:
             if self.ch == '.':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 13
             elif self.ch == '>':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 19
             elif self.ch == ')':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 26
             else:
@@ -547,7 +547,7 @@ class Scanner(object):
                done = True
          elif state == 29:
             if self.ch == '.':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 25
             else:
@@ -555,7 +555,7 @@ class Scanner(object):
                done = True
          elif state == 30:
             if self.ch == '.':
-               buf += unicode(self.ch)
+               buf += str(self.ch)
                self.NextCh()
                state = 18
             else:

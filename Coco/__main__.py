@@ -52,7 +52,8 @@ import os.path
 from .Scanner import Scanner
 from .Errors import Errors
 from .Trace import Trace
-from .Core import DFA, Tab
+from .Core import DFA
+from .Core import Tab
 from .DriverGen import DriverGen
 from .ParserGen import ParserGen
 from .Parser import Parser
@@ -62,18 +63,17 @@ from .setupInfo import MetaData
 
 
 ROOT_DIR = os.path.dirname( __file__ )
-
 class Coco:
    @staticmethod
    def main( argv=None ):
-      print 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+      print('Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] ))
 
       if argv is None:
          if len(sys.argv) == 1:
             argv = [ sys.argv[0], '-h' ]
          else:
             argv = sys.argv
-      options,args = Tab.parseArgs( argv )
+      options, args = Tab.parseArgs( argv )
 
       ATGName = args[1]
       dirName, fileName = os.path.split(ATGName)
@@ -92,18 +92,13 @@ class Coco:
 
       # Initialize the Scanner
       try:
-         s = open( fileName, 'r' )
-         try:
-            strVal = s.read( )
-         except IOError:
-            sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % fileName )
-
-         try:
-            s.close( )
-         except IOError:
-            raise RuntimeError( '-- Compiler Error: cannot close source file "%s"' % fileName )
+         with open(ATGName, 'rt', encoding="utf-8") as s:
+            try:
+               strVal = s.read( )
+            except IOError:
+               sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % ATGName )
       except IOError:
-         raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % fileName )
+         raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % ATGName )
 
       scanner = Scanner( strVal )
       parser  = Parser( )

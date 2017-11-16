@@ -47,7 +47,7 @@ def splitStringList( aString ):
       return val.strip( )
 
    lst = aString.split( ';' )
-   lst = map( strip, lst )
+   lst = list(map( strip, lst ))
 
    return lst
 
@@ -119,8 +119,8 @@ def changeDir( destDir ):
    os.chdir( os.path.normpath(destDir) )
 
 def compareFiles( fn1, fn2 ):
-   f1 = file( os.path.normpath(fn1), 'r' ).read( ).splitlines( )
-   f2 = file( os.path.normpath(fn2), 'r' ).read( ).splitlines( )
+   f1 = open( os.path.normpath(fn1), 'rt', encoding="utf-8").read( ).splitlines( )
+   f2 = open( os.path.normpath(fn2), 'rt', encoding="utf-8").read( ).splitlines( )
 
    return list(difflib.context_diff( f1, f2 ))
 
@@ -182,7 +182,7 @@ class CocoTester( object ):
 
    def compileBases( self, atgFilename,isErrorBase=False ):
       '''Python replacement for compile.bat.'''
-      print 'Compiling bases for test: %s' % atgFilename
+      print('Compiling bases for test: %s' % atgFilename)
 
       if not atgFilename.lower().endswith( '.atg' ):
          baseName = atgFilename
@@ -206,25 +206,25 @@ class CocoTester( object ):
       for name,testType in self._suite:
          self.compileBases( name,testType )
 
-      print 'Done.'
+      print('Done.')
 
    def check( self, name, isErrorTest=False ):
-      print 'Running test: %s' % name
+      print('Running test: %s' % name)
 
       shell( '%s %s.atg >output.txt' % (self._compiler, name) )
       if compareFiles( 'trace.txt', '%s_Trace.txt' % name ):
-         print 'trace files differ for %s' % name
+         print('trace files differ for %s' % name)
          return False
       if compareFiles( 'output.txt', '%s_Output.txt' % name ):
-         print 'output files differ for %s' % name
+         print('output files differ for %s' % name)
          return False
 
       if not isErrorTest:
          if compareFiles( 'Parser.py', '%s_Parser.py' % name ):
-            print 'output files differ for %s' % name
+            print('output files differ for %s' % name)
             return False
          if compareFiles( 'Scanner.py', '%s_Scanner.py' % name ):
-            print 'output files differ for %s' % name
+            print('output files differ for %s' % name)
             return False
 
       deleteFiles( '*.py.old', 'Parser.py', 'Scanner.py', 'output.txt', 'trace.txt' )
@@ -239,8 +239,8 @@ class CocoTester( object ):
          if not passed:
             numFailures += 1
 
-      print '%d tests failed.' % numFailures
-      print 'Done.'
+      print('%d tests failed.' % numFailures)
+      print('Done.')
 
 suite = [
       ( 'TestAlts',           False ),

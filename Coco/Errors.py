@@ -61,7 +61,7 @@ class Errors( object ):
       Errors.mergeErrors = merge
       if Errors.mergeErrors:
          try:
-            Errors.mergedList = open( listName, 'w' )
+            Errors.mergedList = open( listName, 'wt', encoding="utf-8")
          except IOError:
             raise RuntimeError( '-- Compiler Error: could not open ' + listName )
 
@@ -92,7 +92,7 @@ class Errors( object ):
 
    @staticmethod
    def Exception( errMsg ):
-      print errMsg
+      print(errMsg)
       sys.exit( 1 )
 
    @staticmethod
@@ -103,7 +103,7 @@ class Errors( object ):
    @staticmethod
    def display( s, e ):
       Errors.mergedList.write('**** ')
-      for c in xrange( 1, e.col ):
+      for c in range( 1, e.col ):
          if s[c-1] == '\t':
             Errors.mergedList.write( '\t' )
          else:
@@ -115,26 +115,26 @@ class Errors( object ):
       if Errors.mergeErrors:
          # Initialize the line iterator
          srcLineIter = iter(sourceBuffer)
-         srcLineStr  = srcLineIter.next( )
+         srcLineStr  = next(srcLineIter)
          srcLineNum  = 1
 
          try:
             # Initialize the error iterator
             errIter = iter(Errors.errors)
-            errRec  = errIter.next( )
+            errRec  = next(errIter)
 
             # Advance to the source line of the next error
             while srcLineNum < errRec.line:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
 
-               srcLineStr = srcLineIter.next( )
+               srcLineStr = next(srcLineIter)
                srcLineNum += 1
 
             # Write out all errors for the current source line
             while errRec.line == srcLineNum:
                Errors.display( srcLineStr, errRec )
 
-               errRec = errIter.next( )
+               errRec = next(errIter)
          except:
             pass
 
@@ -144,7 +144,7 @@ class Errors( object ):
             while True:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
 
-               srcLineStr = srcLineIter.next( )
+               srcLineStr = next(srcLineIter)
                srcLineNum += 1
          except:
             pass

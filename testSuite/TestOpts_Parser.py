@@ -67,7 +67,7 @@ class Errors( object ):
       Errors.mergeErrors = merge
       if Errors.mergeErrors:
          try:
-            Errors.mergedList = open( listName, 'w' )
+            Errors.mergedList = open( listName, 'wt', encoding="utf-8")
          except IOError:
             raise RuntimeError( '-- Compiler Error: could not open ' + listName )
 
@@ -98,7 +98,7 @@ class Errors( object ):
 
    @staticmethod
    def Exception( errMsg ):
-      print errMsg
+      print(errMsg)
       sys.exit( 1 )
 
    @staticmethod
@@ -109,7 +109,7 @@ class Errors( object ):
    @staticmethod
    def display( s, e ):
       Errors.mergedList.write('**** ')
-      for c in xrange( 1, e.col ):
+      for c in range( 1, e.col ):
          if s[c-1] == '\t':
             Errors.mergedList.write( '\t' )
          else:
@@ -121,26 +121,26 @@ class Errors( object ):
       if Errors.mergeErrors:
          # Initialize the line iterator
          srcLineIter = iter(sourceBuffer)
-         srcLineStr  = srcLineIter.next( )
+         srcLineStr  = next(srcLineIter)
          srcLineNum  = 1
 
          try:
             # Initialize the error iterator
             errIter = iter(Errors.errors)
-            errRec  = errIter.next( )
+            errRec  = next(errIter)
 
             # Advance to the source line of the next error
             while srcLineNum < errRec.line:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
 
-               srcLineStr = srcLineIter.next( )
+               srcLineStr = next(srcLineIter)
                srcLineNum += 1
 
             # Write out all errors for the current source line
             while errRec.line == srcLineNum:
                Errors.display( srcLineStr, errRec )
 
-               errRec = errIter.next( )
+               errRec = next(errIter)
          except:
             pass
 
@@ -150,7 +150,7 @@ class Errors( object ):
             while True:
                Errors.mergedList.write( '%4d %s\n' % (srcLineNum, srcLineStr) )
 
-               srcLineStr = srcLineIter.next( )
+               srcLineStr = next(srcLineIter)
                srcLineNum += 1
          except:
             pass
@@ -246,14 +246,14 @@ class Parser( object ):
             self.Get( )
 
    def WeakSeparator( self, n, syFol, repFol ):
-      s = [ False for i in xrange( Parser.maxT+1 ) ]
+      s = [ False for i in range( Parser.maxT+1 ) ]
       if self.la.kind == n:
          self.Get( )
          return True
       elif self.StartOf(repFol):
          return False
       else:
-         for i in xrange( Parser.maxT ):
+         for i in range( Parser.maxT ):
             s[i] = self.set[syFol][i] or self.set[repFol][i] or self.set[0][i]
          self.SynErr( n )
          while not s[self.la.kind]:
@@ -290,7 +290,7 @@ class Parser( object ):
    def Parse( self, scanner ):
       self.scanner = scanner
       self.la = Token( )
-      self.la.val = u''
+      self.la.val = ''
       self.Get( )
       self.Test()
       self.Expect(0)
@@ -299,10 +299,9 @@ class Parser( object ):
    set = [
       [T,x,x,x, x,x,x,x, x]
 
-      ]
+   ]
 
    errorMessages = {
-      
       0 : "EOF expected",
       1 : "a expected",
       2 : "b expected",
@@ -312,6 +311,6 @@ class Parser( object ):
       6 : "f expected",
       7 : "??? expected",
       8 : "invalid Test",
-      }
+   }
 
 

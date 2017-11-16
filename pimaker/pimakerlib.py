@@ -51,7 +51,7 @@ def splitStringList( aString ):
       return val.strip( )
 
    lst = aString.split( ';' )
-   lst = map( strip, lst )
+   lst = list(map( strip, lst ))
 
    return lst
 
@@ -123,8 +123,8 @@ def changeDir( destDir ):
    os.chdir( os.path.normpath(destDir) )
 
 def compareFiles( fn1, fn2 ):
-   f1 = file( os.path.normpath(fn1), 'r' ).read( ).splitlines( )
-   f2 = file( os.path.normpath(fn2), 'r' ).read( ).splitlines( )
+   f1 = open( os.path.normpath(fn1), 'rt', encoding="utf-8").read( ).splitlines( )
+   f2 = open( os.path.normpath(fn2), 'rt', encoding="utf-8").read( ).splitlines( )
 
    return list(difflib.context_diff( f1, f2 ))
 
@@ -137,7 +137,7 @@ def dos2unix( filename ):
    import sys
 
    for fname in fName:
-      infile = open( fname, "rb" )
+      infile = open( fname, "rb", encoding="utf-8" )
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\r\n", "\n" ).replace( "\r", "\n" )
@@ -145,7 +145,7 @@ def dos2unix( filename ):
       if len(outstr) == len(instr):
          continue
 
-      outfile = open( fname, "wb" )
+      outfile = open( fname, "wb", encoding="utf-8" )
       outfile.write( outstr )
       outfile.close()
 
@@ -158,7 +158,7 @@ def unix2dos( filename ):
    import sys
 
    for fname in fName:
-      infile = open( fname, "rb" )
+      infile = open( fname, "rb", encoding="utf-8")
       instr = infile.read()
       infile.close()
       outstr = instr.replace( "\n", "\r\n" )
@@ -166,7 +166,7 @@ def unix2dos( filename ):
       if len(outstr) == len(instr):
          continue
 
-      outfile = open( fname, "wb" )
+      outfile = open( fname, "wb", encoding="utf-8")
       outfile.write( outstr )
       outfile.close()
 
@@ -197,7 +197,7 @@ class Rule( object ):
       self._action = self.expandMacros( action )
 
    def getDependancies( self ):
-      return self._dependancies.keys( )
+      return list(self._dependancies.keys( ))
 
    def getDescription( self ):
       return self._description
@@ -214,12 +214,12 @@ class Rule( object ):
       else:
          needToRebuildTarget = not os.path.exists( target )
 
-      for dependency, subrule in self._dependancies.iteritems( ):
+      for dependency, subrule in self._dependancies.items( ):
          dependency = os.path.normpath( dependency )
          if not os.path.exists( dependency ):
             if subrule:
                subrule.build( )
-               print '-----------------------------------'
+               print('-----------------------------------')
             else:
                raise Exception( 'No rule to build target %s' % dependency )
 
@@ -231,7 +231,7 @@ class Rule( object ):
                needToRebuildTarget = True
 
       if needToRebuildTarget:
-         print 'Building: %s' % target
+         print('Building: %s' % target)
          execActionCode( self._action )
 
    def expandMacros( self, aString ):
@@ -249,7 +249,7 @@ class Rule( object ):
 
          value = globals( )[ var ]
 
-         if isinstance( value, (str,unicode) ):
+         if isinstance( value, str ):
             if op == 'dir':
                value = os.path.dirname( value )
             elif op == 'name':
@@ -318,7 +318,7 @@ class Builder( object ):
 
    def finalize( self ):
       # Assemble the Rules into a Tree
-      for target, rule in self._rules.iteritems( ):
+      for target, rule in self._rules.items( ):
          for dependencyName in rule.getDependancies( ):
             if dependencyName in self._rules:
                rule.defineDependencyRule( dependencyName, self._rules[ dependencyName ] )
@@ -327,10 +327,10 @@ class Builder( object ):
                   self._leaves.append( dependencyName )
 
       # Determine the top-level targets
-      targets = self._rules.keys( )
+      targets = list(self._rules.keys( ))
 
-      for name in self._rules.keys( ):
-         for rule in self._rules.values( ):
+      for name in list(self._rules.keys( )):
+         for rule in list(self._rules.values( )):
             if name in rule.getDependancies( ):
                if name in targets:
                   targets.remove( name )
@@ -342,69 +342,69 @@ class Builder( object ):
             self._topLevelTargets.append( ( targetName, self._rules[ targetName ].getDescription() ) )
 
    def targets( self ):
-      return self._rules.keys( )
+      return list(self._rules.keys( ))
 
    def build( self, target ):
-      print '********** Target: %s' % target
+      print('********** Target: %s' % target)
 
       try:
          theRule = self._rules[ target ]
          theRule.build( )
-         print '********** Build completed'
+         print('********** Build completed')
       except:
          type,value,trace = sys.exc_info( )
-         print 'BUILD FAILED!!!'
-         print traceback.print_exc( )
+         print('BUILD FAILED!!!')
+         print(traceback.print_exc( ))
 
    def topTargets( self ):
       return self._topLevelTargets
 
    def allTargets( self ):
-      return self._rules.keys( )
+      return list(self._rules.keys( ))
 
    def initializationCode( self, code ):
       execActionCode( code )
 
    def goInteractive( self ):
-      print
-      print 'Entering Interactive Builder'
+      print()
+      print('Entering Interactive Builder')
 
       response = ''
       self._buildMenu( )
       while response != 'exit':
-         target = raw_input( '\nbuild> ' )
+         target = input( '\nbuild> ' )
 
          if target == 'showall':
             targetList = self.allTargets( )
             targetList.sort( )
-            print ', '.join( targetList )
+            print(', '.join( targetList ))
             continue
          elif target == 'exit':
             break
          elif target in self.allTargets( ):
-            print
-            print
+            print()
+            print()
             self.build( target )
          else:
-            print '   !!! Unknown Target !!!'
+            print('   !!! Unknown Target !!!')
 
          self._buildMenu( )
 
    def _buildMenu( self ):
-      print
-      print 'Targets:'
+      print()
+      print('Targets:')
       for targetName, targetDescription in self._topLevelTargets:
-         print '   %-15s  %s' % ( targetName, targetDescription )
+         print('   %-15s  %s' % ( targetName, targetDescription ))
 
-      print
-      print '   %-15s  %s' % ( 'showall', 'Show the full list of targets.' )
-      print '   %-15s  %s' % ( 'exit', 'Exit the interactive builder.' )
+      print()
+      print('   %-15s  %s' % ( 'showall', 'Show the full list of targets.' ))
+      print('   %-15s  %s' % ( 'exit', 'Exit the interactive builder.' ))
 
 
 bld = Builder( )
 
 def execActionCode( code ):
-   exec code in globals( )
+   exec(code, globals( ))
 
 
 class Path( object ):

@@ -28,9 +28,7 @@
 -->begin
 import sys
 
-from Scanner import Token
-from Scanner import Scanner
-from Scanner import Position
+from .Scanner import Token, Scanner, Position
 
 class Parser( object ):
 -->constants
@@ -106,14 +104,14 @@ class Parser( object ):
             self.Get( )
 
    def WeakSeparator( self, n, syFol, repFol ):
-      s = [ False for i in xrange( Parser.maxT+1 ) ]
+      s = [ False for i in range( Parser.maxT+1 ) ]
       if self.la.kind == n:
          self.Get( )
          return True
       elif self.StartOf(repFol):
          return False
       else:
-         for i in xrange( Parser.maxT ):
+         for i in range( Parser.maxT ):
             s[i] = self.set[syFol][i] or self.set[repFol][i] or self.set[0][i]
          self.SynErr( n )
          while not s[self.la.kind]:
@@ -125,17 +123,16 @@ class Parser( object ):
    def Parse( self, scanner ):
       self.scanner = scanner
       self.la = Token( )
-      self.la.val = u''
+      self.la.val = ''
       self.Get( )
       self.-->parseRoot
 
    set = [
 -->initialization
-      ]
+   ]
 
-   errorMessages = {
-      -->errors
-      }
+   errorMessages = {-->errors
+   }
 
 
 $$$

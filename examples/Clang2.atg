@@ -7,7 +7,7 @@ COMPILER Clang2
    @staticmethod
    def NewLine():
       sys.stdout.write( '\n' )
-      for i in xrange( 0, level ):
+      for i in range( 0, level ):
          sys.stdout.write( '   ' )
 
    @staticmethod

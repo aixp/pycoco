@@ -32,7 +32,7 @@ COMPILER pimaker
          return ''
 
       # Find prevailing indentation
-      for idx in xrange(0,len(prevailingLine)):
+      for idx in range(0,len(prevailingLine)):
          if not prevailingLine[idx].isspace( ):
             break
 

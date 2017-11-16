@@ -67,7 +67,7 @@ ROOT_DIR = os.path.dirname( __file__ )
 class Coco:
    @staticmethod
    def main( argv=None ):
-      print 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+      print('Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] ))
 
       if argv is None:
          if len(sys.argv) == 1:
@@ -93,7 +93,7 @@ class Coco:
 
       # Initialize the Scanner
       try:
-         s = open( fileName, 'r' )
+         s = open( fileName, 'rt', encoding="utf-8")
          try:
             strVal = s.read( )
          except IOError:

@@ -34,7 +34,7 @@ class CharClass( object ):
    charSetSize = 256     # must be a multiple of 16
 
    def __init__( self, name, s ):
-      assert isinstance( name, (str,unicode) )
+      assert isinstance( name, str )
       assert isinstance( s, set )
       if name == "#":
          name = "#" + chr(CharClass.dummyName)
@@ -46,8 +46,8 @@ class CharClass( object ):
 
    @staticmethod
    def Find( nameOrSet ):
-      assert isinstance( nameOrSet, (str, unicode, set) )
-      if isinstance(nameOrSet,(str,unicode)):
+      assert isinstance( nameOrSet, (str, set) )
+      if isinstance(nameOrSet,str):
          name = nameOrSet
          for c in CharClass.classes:
             if c.name == name:
@@ -67,8 +67,8 @@ class CharClass( object ):
 
    @staticmethod
    def Ch( ch ):
-      assert isinstance( ch, (str,unicode) ) or isinstance( ch, int )
-      if isinstance( ch, (str,unicode) ):
+      assert isinstance( ch, str ) or isinstance( ch, int )
+      if isinstance( ch, str ):
          ch = ord(ch)
       if ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\'):
          return str(ch)

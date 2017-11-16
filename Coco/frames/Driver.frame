@@ -41,7 +41,7 @@ dirName, fileName = os.path.split(srcName)
 
 # Initialize the Scanner
 try:
-   s = open( fileName, 'r' )
+   s = open( fileName, 'rt', encoding="utf-8" )
    try:
       strVal = s.read( ).decode( locale.getpreferredencoding() )
    except IOError:

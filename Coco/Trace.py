@@ -37,7 +37,7 @@ class Trace( object ):
       assert isinstance( dir, str )
       Trace.fileName = os.path.join( dir, 'trace.txt' )
       try:
-         Trace.trace = file( Trace.fileName, 'w' )
+         Trace.trace = open(Trace.fileName, 'wt', encoding="utf-8")
       except IOError:
          raise RuntimeError( '-- Compiler Error: could not open ' + Trace.fileName )
 
@@ -45,7 +45,7 @@ class Trace( object ):
    def formatString( s, w ):
       ''' Returns a string with a minimum length of |w| characters
       the string is left-adjusted if w < 0 and right-adjusted otherwise'''
-      assert isinstance( s, (str,unicode) )
+      assert isinstance( s, str )
       assert isinstance( w, int )
 
       size = len(s)
@@ -54,14 +54,14 @@ class Trace( object ):
          b += ' ' * (w - size)
          return b + s
       else:
-         for i in xrange( w, -size ):
+         for i in range( w, -size ):
             b += ' '
          return s + b
 
    @staticmethod
    def Write( s, w=None ):
       '''writes a string with a maximum length of |w| characters'''
-      assert isinstance( s, (str,unicode) )
+      assert isinstance( s, str )
       assert isinstance( w, int ) or (w is None)
       if w is None:
          Trace.trace.write( s )
@@ -70,7 +70,7 @@ class Trace( object ):
 
    @staticmethod
    def WriteLine( s=None, w=None ):
-      assert isinstance( s, (str,unicode) ) or (s is None)
+      assert isinstance( s, str ) or (s is None)
       assert isinstance( w, int ) or (w is None)
       if s is not None:
          if w is not None:
@@ -87,5 +87,5 @@ class Trace( object ):
       if stat.st_size == 0:
          os.remove( Trace.fileName )
       else:
-         print
-         print 'trace output is in', Trace.fileName
+         print()
+         print('trace output is in', Trace.fileName)
