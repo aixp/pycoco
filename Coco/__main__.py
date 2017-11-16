@@ -63,25 +63,20 @@ from .setupInfo import MetaData
 
 
 ROOT_DIR = os.path.dirname( __file__ )
-class Coco:
-   @staticmethod
-   def main( argv=None ):
-      print('Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] ))
 
-      if argv is None:
-         if len(sys.argv) == 1:
-            argv = [ sys.argv[0], '-h' ]
-         else:
-            argv = sys.argv
-      options, args = Tab.parseArgs( argv )
+from .CLI import CocoArgs
+import plumbum.cli
 
-      ATGName = args[1]
+class CocoCli(CocoArgs):
+   DESCRIPTION = 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+   def main(self, ATGName:plumbum.cli.ExistingFile):
+      Tab.SetDDT( self )
       dirName, fileName = os.path.split(ATGName)
 
       # Setup the default frame directory
       try:
-         if options.frameFileDir:
-            framesDir = options.frameFileDir
+         if self.frameFileDir:
+            framesDir = self.frameFileDir
          else:
             framesDir = os.path.join( ROOT_DIR, 'frames' )
 
@@ -116,8 +111,8 @@ class Coco:
       Errors.Summarize( scanner.buffer )
       Trace.Close()
       if Errors.count != 0:
-         sys.exit(1)
+         return 1
+
 
 if __name__=="__main__":
-   Coco.main( )
-
+   CocoCli.run()

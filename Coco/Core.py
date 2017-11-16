@@ -636,64 +636,6 @@ class Tab:
    visited        = None           #set,   mark list for graph traversals
    curSy          = None           #Symbol,   current symbol in computation of sets
 
-   @staticmethod
-   def parseArgs( argv, testArgCt=False ):
-      usage = 'usage: %prog [options] filename.atg'
-      optParser = OptionParser( usage )
-      optParser.add_option( '-a', '-A', dest='traceAutomaton',
-                         action='store_true', default=False,
-                         help='Include automaton tracing in the trace file.' )
-      optParser.add_option( '-c', '-C', dest='generateDriver',
-                         action='store_true', default=False,
-                         help='Generate a main compiler source file.' )
-      optParser.add_option( '-f', '-F', dest='firstAndFollow',
-                         action='store_true', default=False,
-                         help='Include first & follow sets in the trace file.' )
-      optParser.add_option( '-g', '-G', dest='syntaxGraph',
-                         action='store_true', default=False,
-                         help='Include syntax graph in the trace file.' )
-      optParser.add_option( '-i', '-I', dest='traceComputations',
-                         action='store_true', default=False,
-                         help='Include a trace of the computations for first sets in the trace file.' )
-      optParser.add_option( '-j', '-J', dest='listAnyAndSync',
-                         action='store_true', default=False,
-                         help='Inclue a listing of the ANY and SYNC sets in the trace file.' )
-      optParser.add_option( '-m', '-M', dest='mergeErrors',
-                         action='store_true', default=False,
-                         help='Merge error messages in the source listing.' )
-      optParser.add_option( '-n', '-N', dest='tokenNames',
-                         action='store_true', default=False,
-                         help='Generate token names in the source listing.' )
-      optParser.add_option( '-p', '-P', dest='statistics',
-                         action='store_true', default=False,
-                         help='Include a listing of statistics in the trace file.' )
-      optParser.add_option( '-r', '-R', dest='frameFileDir',
-                            default=None,
-                         help='Use scanner.frame and parser.frame in directory DIR.', metavar='DIR' )
-      optParser.add_option( '-s', '-S', dest='symbolTable',
-                         action='store_true', default=False,
-                         help='Include the symbol table listing in the trace file.' )
-      optParser.add_option( '-t', '-T', dest='testOnly',
-                         action='store_true', default=False,
-                         help='Test the grammar only, don\'t generate any files.' )
-      optParser.add_option( '-x', '-X', dest='crossReferences',
-                         action='store_true', default=False,
-                         help='Include a cross reference listing in the trace file.' )
-
-      if argv is None:
-         options, args = optParser.parse_args( )
-      else:
-         options, args = optParser.parse_args( argv )
-
-      Tab.SetDDT( options )
-
-      if testArgCt:
-         if len(args) != 2:
-            optParser.print_help( )
-            sys.exit( )
-
-      return options,args
-
    #---------------------------------------------------------------------
    #  Symbol set computations
    #---------------------------------------------------------------------
@@ -1403,9 +1345,9 @@ class Tab:
                   'symbolTable':        6,
                   'testOnly':           9,
                   'crossReferences':    7 }
-      for key,value in options.items( ):
-         if s.__dict__[ key ]:
-            Tab.ddt[ value ] = True
+      for key, code in options.items( ):
+         if getattr(s, key):
+            Tab.ddt[ code ] = True
 
    @staticmethod
    def Init():

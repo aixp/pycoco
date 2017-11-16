@@ -1,4 +1,3 @@
-Coco/R v1.1.0rc for Python (May 16, 2007) - Translated by Ron Longo (ron.longo@cox.net)
 
 file TestTokens1.atg : (17, 3) tokens B2 and B1 cannot be distinguished
 file TestTokens1.atg : (19, 3) tokens C2 and C1 cannot be distinguished

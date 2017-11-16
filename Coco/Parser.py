@@ -37,6 +37,8 @@ import sys
 
 from .Scanner import Token, Scanner, Position
 
+from .CLI import parseArgs
+
 class Parser( object ):
    _EOF = 0
    _ident = 1
@@ -157,7 +159,7 @@ class Parser( object ):
             break
          if self.la.kind == Scanner.ddtSym_Sym:
             self.la.val = '-' + str(self.la.val[1:])
-            Tab.parseArgs( [ self.la.val, 'filler1', 'filler2' ] ) 
+            parseArgs( [ self.la.val] ) 
 
          self.la = self.token
 

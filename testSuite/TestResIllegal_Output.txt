@@ -1,5 +1,3 @@
-Coco/R v1.1.0rc for Python (May 16, 2007) - Translated by Ron Longo (ron.longo@cox.net)
-
 checking
 file TestResIllegal.atg : (8, 14) Misplaced resolver: no alternative.
 file TestResIllegal.atg : (9, 9) Resolver will never be evaluated. Place it at previous conflicting alternative.

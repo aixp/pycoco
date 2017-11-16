@@ -49,40 +49,34 @@ import sys
 import os
 import os.path
 
-from Scanner import Scanner
-from Errors import Errors
-from Trace import Trace
-from Core import DFA
-from Core import Tab
-from DriverGen import DriverGen
-from ParserGen import ParserGen
-from Parser import Parser
-from CodeGenerator import CodeGenerator
+from .Scanner import Scanner
+from .Errors import Errors
+from .Trace import Trace
+from .Core import DFA
+from .Core import Tab
+from .DriverGen import DriverGen
+from .ParserGen import ParserGen
+from .Parser import Parser
+from .CodeGenerator import CodeGenerator
 
-from setupInfo import MetaData
+from .setupInfo import MetaData
 
+from .CLI import CocoArgs
+import plumbum.cli
 
 ROOT_DIR = os.path.dirname( __file__ )
 -->begin
-class Coco:
-   @staticmethod
-   def main( argv=None ):
-      print('Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] ))
 
-      if argv is None:
-         if len(sys.argv) == 1:
-            argv = [ sys.argv[0], '-h' ]
-         else:
-            argv = sys.argv
-      options,args = Tab.parseArgs( argv )
-
-      ATGName = args[1]
+class CocoCli(CocoArgs):
+   DESCRIPTION = 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+   def main(self, ATGName:plumbum.cli.ExistingFile):
+      Tab.SetDDT( self )
       dirName, fileName = os.path.split(ATGName)
 
       # Setup the default frame directory
       try:
-         if options.frameFileDir:
-            framesDir = options.frameFileDir
+         if self.frameFileDir:
+            framesDir = self.frameFileDir
          else:
             framesDir = os.path.join( ROOT_DIR, 'frames' )
 
@@ -93,18 +87,13 @@ class Coco:
 
       # Initialize the Scanner
       try:
-         s = open( fileName, 'rt', encoding="utf-8")
-         try:
-            strVal = s.read( )
-         except IOError:
-            sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % fileName )
-
-         try:
-            s.close( )
-         except IOError:
-            raise RuntimeError( '-- Compiler Error: cannot close source file "%s"' % fileName )
+         with open(ATGName, 'rt', encoding="utf-8") as s:
+            try:
+               strVal = s.read( )
+            except IOError:
+               sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % ATGName )
       except IOError:
-         raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % fileName )
+         raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % ATGName )
 
       scanner = Scanner( strVal )
       parser  = Parser( )
@@ -122,9 +111,8 @@ class Coco:
       Errors.Summarize( scanner.buffer )
       Trace.Close()
       if Errors.count != 0:
-         sys.exit(1)
+         return 1
 
 if __name__=="__main__":
-   Coco.main( )
-
+   CocoCli.run()
 $$$

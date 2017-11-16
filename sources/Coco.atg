@@ -61,7 +61,7 @@ TOKENS
 
 PRAGMAS
   ddtSym    = '$' { digit | letter }.  (. self.la.val = '-' + str(self.la.val[1:])
-                                          Tab.parseArgs( [ self.la.val, 'filler1', 'filler2' ] ) .)
+                                          Tab.parseArgs( [ self.la.val ] ) .)
 
 COMMENTS FROM "/*" TO "*/" NESTED
 COMMENTS FROM "//" TO lf
