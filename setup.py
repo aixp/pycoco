@@ -1,5 +1,18 @@
-from distutils.core import setup
+#!/usr/bin/env python3
+import os
+from setuptools import setup
+from setuptools.config import read_configuration
 
-from Coco.setupInfo import MetaData
+curDir = os.path.dirname(__file__)
+setupCfgPath=os.path.join(curDir, "setup.cfg")
+cfg = read_configuration(setupCfgPath)
 
-setup( **MetaData )
+#print(cfg)
+cfg["options"].update(cfg["metadata"])
+cfg=cfg["options"]
+setup(use_scm_version = True, **cfg)
+
+
+
+
+
