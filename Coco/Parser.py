@@ -994,12 +994,14 @@ class Parser( object ):
       g = None
       if self.la.kind == Scanner.ident_Sym or self.la.kind == Scanner.string_Sym:
          s = self.Sym()
-         name,kind = s
+         name, kind = s
          if kind == self.id:
             c = CharClass.Find(name)
             if c is None:
-               self.SemErr("undefined name")
-               c = CharClass(s.name, set( ) )
+               c = Symbol.Find(name)
+               if c is None:
+                  self.SemErr("undefined name "+name)
+                  c = CharClass(name, set( ) )
             p = Node(Node.clas, None, 0)
             p.val = c.n
             g = Graph(p)
