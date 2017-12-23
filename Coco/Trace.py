@@ -47,16 +47,8 @@ class Trace( object ):
       the string is left-adjusted if w < 0 and right-adjusted otherwise'''
       assert isinstance( s, str )
       assert isinstance( w, int )
-
-      size = len(s)
-      b = ''
-      if w >= 0:
-         b += ' ' * (w - size)
-         return b + s
-      else:
-         for i in range( w, -size ):
-            b += ' '
-         return s + b
+      b = ' ' * (abs(w) - len(s))
+      return b + s if w >= 0 else s + b
 
    @staticmethod
    def Write( s:str, w:int=None ):
