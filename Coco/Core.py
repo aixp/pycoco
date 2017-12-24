@@ -1279,7 +1279,7 @@ class Tab:
       Trace.WriteLine()
       Trace.WriteLine("Literal Tokens:")
       Trace.WriteLine("--------------")
-      for me_key, me_value in Tab.literals.items():
+      for me_key, me_value in sorted(Tab.literals.items()):
          Trace.WriteLine("_" + me_value.name + " = " + me_key + ".");
       Trace.WriteLine()
 
