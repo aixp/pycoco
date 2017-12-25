@@ -10,9 +10,9 @@ from .util import *
 TARGET = ''
 NEEDS  = [ ]
 
-testSuiteBaseDir=os.path.dirname(__file__)
-testsDir=os.path.join(testSuiteBaseDir, "tests")
-tmpDir=os.path.join(testSuiteBaseDir, "tmp")
+testSuiteBaseDir = os.path.dirname(__file__)
+testsDir = os.path.join(testSuiteBaseDir, "tests")
+tmpDir = os.path.join(testSuiteBaseDir, "tmp")
 
 class CocoTester( object ):
    def __init__( self, compiler, targetLanguageExt, testSuite ):
@@ -21,17 +21,17 @@ class CocoTester( object ):
       self._suite       = testSuite
    
    def generateTest(self, name, isErrorTest):
-      dirName=os.path.join(testsDir, name)
-      testFileName=os.path.join(dirName, 'Test.atg')
+      dirName = os.path.join(testsDir, name)
+      testFileName = os.path.join(dirName, 'Test.atg')
       
-      outputFileName=os.path.join(dirName, 'Output.txt')
-      traceFileName=os.path.join(dirName, 'Trace.txt')
-      parserFileName=os.path.join(dirName, 'Parser.py')
-      scannerFileName=os.path.join(dirName, 'Scanner.py')
+      outputFileName  = os.path.join(dirName, 'Output.txt')
+      traceFileName   = os.path.join(dirName, 'Trace.txt')
+      parserFileName  = os.path.join(dirName, 'Parser.py')
+      scannerFileName = os.path.join(dirName, 'Scanner.py')
       
-      traceResFileName=os.path.join(tmpDir, 'trace.txt')
-      parserResFileName=os.path.join(tmpDir, 'Parser.py')
-      scannerResFileName=os.path.join(tmpDir, 'Scanner.py')
+      traceResFileName   = os.path.join(tmpDir, 'trace.txt')
+      parserResFileName  = os.path.join(tmpDir, 'Parser.py')
+      scannerResFileName = os.path.join(tmpDir, 'Scanner.py')
       
       class Test(unittest.TestCase):
          maxDiff=None
@@ -46,7 +46,7 @@ class CocoTester( object ):
                stdout=subprocess.PIPE
             ) as proc:
                proc.wait()
-               __class__.output=io.TextIOWrapper(proc.stdout).read()
+               __class__.output = io.TextIOWrapper(proc.stdout).read()
             os.makedirs(tmpDir, exist_ok=True)
          
          def testTrace(tself):
@@ -54,7 +54,7 @@ class CocoTester( object ):
          
          def testOutput(tself):
             with open(outputFileName, "rt", encoding="utf-8") as f:
-               referenceOuput=f.read()
+               referenceOuput = f.read()
             tself.assertEqual(__class__.output, referenceOuput)
          
          if not isErrorTest:
@@ -72,8 +72,8 @@ class CocoTester( object ):
          test.__name__=name
          yield test
    def __call__(self):
-      loader=unittest.TestLoader()
-      runner=unittest.TextTestRunner()
+      loader = unittest.TestLoader()
+      runner = unittest.TextTestRunner()
       for testClass in self.generateTests():
          runner.run(loader.loadTestsFromTestCase(testClass))
 
