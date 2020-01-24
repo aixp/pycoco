@@ -1,5 +1,5 @@
 import os
-import os.path
+from pathlib import Path
 
 class CodeGenerator( object ):
    CR          = '\r'
@@ -23,12 +23,12 @@ class CodeGenerator( object ):
 
       self._frameFile = None
       for frameName in frameFileName:
-         fr = os.path.join( self.__class__.sourceDir, frameName )
-         if not os.path.exists( fr ):
+         fr = self.__class__.sourceDir / frameName
+         if not fr.is_file():
             if self.__class__.frameDir is not None:
-               fr = os.path.join( self.__class__.frameDir, frameName )
+               fr = self.__class__.frameDir / frameName
          try:
-            self._frameFile = open( fr, 'rt', encoding="utf-8")
+            self._frameFile = fr.open('rt', encoding="utf-8")
             break
          except IOError:
             pass
@@ -37,15 +37,15 @@ class CodeGenerator( object ):
          raise RuntimeError( '-- Compiler Error: Cannot open ' + frameFileName[0] )
 
       try:
-         fn = os.path.join( self.__class__.outputDir, outputFileName )
-         fn = str(fn)
-         if backup and os.path.exists( fn ):
-            if os.path.exists( fn + '.old' ):
-               os.remove( fn + '.old' )
-            os.rename( fn, fn + '.old' )
-         self._outputFile = open( fn, 'wt', encoding="utf-8")
+         fn = self.__class__.outputDir / outputFileName
+         if backup and fn.is_file():
+            backup = fn.parent / (fn.name + ".old")
+            if backup.is_file():
+               os.remove(str(backup))
+            os.rename(fn, str(backup))
+         self._outputFile = fn.open('wt', encoding="utf-8")
       except:
-         raise RuntimeError( '-- Compiler Error: Cannot create ' + outputFileName[0] + '.py' )
+         raise RuntimeError( '-- Compiler Error: Cannot create ' + str(outputFileName[0]) + '.py' )
 
    def close( self ):
       self._frameFile.close( )

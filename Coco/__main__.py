@@ -47,7 +47,7 @@
 #  -------------------------------------------------------------------------*/
 import sys
 import os
-import os.path
+from pathlib import Path
 
 from .Scanner import Scanner
 from .Errors import Errors
@@ -62,16 +62,21 @@ from .CodeGenerator import CodeGenerator
 from .setupInfo import MetaData
 
 
-ROOT_DIR = os.path.dirname( __file__ )
+ROOT_DIR = Path( __file__ ).absolute().parent
 
 from .CLI import CocoArgs
 import plumbum.cli
 
 class CocoCli(CocoArgs):
-   DESCRIPTION = 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+   if 'version' in MetaData and 'author' in MetaData and 'author_email' in MetaData:
+      DESCRIPTION = 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
+   else:
+      DESCRIPTION = 'Coco/R v??? for Python (May 16, 2007) - Translated by ??? (??)\nWE CANNOT RETRIEVE THE METADATA correctly, SOMETHING GONE WRONG, FIX IT: ' + repr(MetaData)
    def main(self, ATGName:plumbum.cli.ExistingFile):
       Tab.SetDDT( self )
-      dirName, fileName = os.path.split(ATGName)
+      ATGName = Path(ATGName)
+      dirName = ATGName.parent
+      fileName = ATGName.name
       
       if not self.outputDir:
          self.outputDir=dirName
@@ -81,7 +86,7 @@ class CocoCli(CocoArgs):
          if self.frameFileDir:
             framesDir = self.frameFileDir
          else:
-            framesDir = os.path.join( ROOT_DIR, 'frames' )
+            framesDir = ROOT_DIR / 'frames'
          CodeGenerator.frameDir = framesDir
          Tab.frameDir           = framesDir
       except:
@@ -89,11 +94,11 @@ class CocoCli(CocoArgs):
 
       # Initialize the Scanner
       try:
-         with open(ATGName, 'rt', encoding="utf-8") as s:
+         with ATGName.open('rt', encoding="utf-8") as s:
             try:
                strVal = s.read( )
             except IOError:
-               sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % ATGName )
+               raise RuntimeError( '-- Compiler Error: Failed to read from source file "%s"\n' % ATGName )
       except IOError:
          raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % ATGName )
 

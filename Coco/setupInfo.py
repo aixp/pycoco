@@ -1,13 +1,22 @@
 from setuptools.config import read_configuration
 import os
+from pathlib import Path
 
-curDir=os.path.dirname(__file__)
-setupCfgPath=os.path.join(curDir, "..", "setup.cfg")
-if os.path.isfile(setupCfgPath):
+curDir = Path(__file__).absolute().parent
+setupCfgPath = curDir / ".." / "setup.cfg"
+if setupCfgPath.is_file():
    MetaData = read_configuration(setupCfgPath)["metadata"]
 else:
-   from pkg_resources import get_distribution
-   MetaData = get_distribution('Coco').__dict__
+   try:
+      from importlib import metadata
+      MetaData = metadata.metadata('CocoPy')
+   except ImportError:
+      from pkg_resources import get_distribution, DistributionNotFound
+      try:
+         d = get_distribution('CocoPy')
+      except DistributionNotFound:
+         d = get_distribution('Coco')
+      MetaData = d.__dict__
 
 VersionInfo = {
    '1.1.0rc': {

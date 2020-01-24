@@ -58,13 +58,13 @@ class Errors( object ):
       Errors.getParsingPos = getParsingPos
       Errors.errorMessages = errorMessages
       Errors.fileName = fn
-      listName = os.path.join(dir, 'listing.txt')
+      listName = dir / 'listing.txt'
       Errors.mergeErrors = merge
       if Errors.mergeErrors:
          try:
-            Errors.mergedList = open( listName, 'wt', encoding="utf-8")
+            Errors.mergedList = listName.open('wt', encoding="utf-8")
          except IOError:
-            raise RuntimeError( '-- Compiler Error: could not open ' + listName )
+            raise RuntimeError( '-- Compiler Error: could not open ' + str(listName) )
 
    @staticmethod
    def storeError( line, col, s ):

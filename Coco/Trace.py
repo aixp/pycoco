@@ -26,7 +26,8 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 
-import os.path
+import os
+from pathlib import Path
 
 class Trace( object ):
    fileName = ''
@@ -34,10 +35,10 @@ class Trace( object ):
 
    @staticmethod
    def Init( dir ):
-      assert isinstance( dir, str )
-      Trace.fileName = os.path.join( dir, 'trace.txt' )
+      assert isinstance( dir, Path )
+      Trace.fileName = dir / 'trace.txt'
       try:
-         Trace.trace = open(Trace.fileName, 'wt', encoding="utf-8")
+         Trace.trace = Trace.fileName.open('wt', encoding="utf-8")
       except IOError:
          raise RuntimeError( '-- Compiler Error: could not open ' + Trace.fileName )
 
@@ -75,9 +76,9 @@ class Trace( object ):
    @staticmethod
    def Close( ):
       Trace.trace.close( )
-      stat = os.stat( Trace.fileName )
+      stat = os.stat( str(Trace.fileName) )
       if stat.st_size == 0:
          os.remove( Trace.fileName )
       else:
          print()
-         print('trace output is in', os.path.basename(Trace.fileName))
+         print('trace output is in', Trace.fileName.parent)

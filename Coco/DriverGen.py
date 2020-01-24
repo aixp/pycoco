@@ -26,7 +26,7 @@
 #Coco/R itself) does not fall under the GNU General Public License.
 #-------------------------------------------------------------------------*/
 import os
-import os.path
+from pathlib import Path
 from .Errors import Errors
 from .Core import Tab
 from .CodeGenerator import CodeGenerator
@@ -53,12 +53,13 @@ class DriverGen( object ):
       #DriverGen.codeGen.write( Tab.gramSy.name )
       DriverGen.codeGen.CopyFramePart( '$$$' )
       DriverGen.codeGen.close( )
-      os.chmod(os.path.join( __class__.outDir, fn ), 0o755)
+      os.chmod(__class__.outDir / fn, 0o755)
 
    @staticmethod
-   def Init( f, dir, outDir):
+   def Init( f: str, dir: Path, outDir: Path):
       assert isinstance( f, str )
-      assert isinstance( dir, str )
+      assert isinstance( dir, Path )
+      assert isinstance( outDir, Path )
       DriverGen.srcName = f
       DriverGen.srcDir  = dir
       DriverGen.outDir  = outDir

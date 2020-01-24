@@ -27,7 +27,7 @@
 #-------------------------------------------------------------------------*/
 import copy
 import os
-import os.path
+from pathlib import Path
 import io
 
 from .Errors import Errors
@@ -301,9 +301,9 @@ class ParserGen( object ):
             __class__.codeGen.write( 'x],\n' )
 
    @staticmethod
-   def Init( fn, dir ):
+   def Init( fn, dir: Path ):
       assert isinstance( fn, str )
-      assert isinstance( dir, str )
+      assert isinstance( dir, Path )
       __class__.srcName = fn
       __class__.srcDir  = dir
       __class__.errorNr = -1

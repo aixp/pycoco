@@ -4,8 +4,15 @@ import traceback
 import shutil
 import unittest
 import subprocess
+import platform
 
 from .util import *
+
+interpreter = "python"
+
+if platform.system() != "win32":
+   interpreter += "3"
+
 
 TARGET = ''
 NEEDS  = [ ]
@@ -39,7 +46,7 @@ class CocoTester( object ):
             print('Running test: '+name)
             with subprocess.Popen(
                [
-                  "python",
+                  interpreter,
                   "-m", self._compiler, "-i", '-O', tmpDir, testFileName
                ],
                shell=True,
