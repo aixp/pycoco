@@ -24,7 +24,7 @@ TOKENS
 COMMENTS
   FROM '(*' TO '*)' NESTED
 
-IGNORE  CHR(9) .. CHR(13)
+IGNORE  ' ' + CHR(9) .. CHR(13)
 
 PRODUCTIONS
   Mod2         =  DefMod | [ "IMPLEMENTATION" ] ProgMod .

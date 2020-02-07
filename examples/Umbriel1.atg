@@ -30,7 +30,7 @@ TOKENS
 
 COMMENTS FROM '(*' TO '*)' NESTED
 
-IGNORE CHR(9) .. CHR(13)
+IGNORE ' ' + CHR(9) .. CHR(13)
   /* The language is case sensitive */
 
 PRODUCTIONS

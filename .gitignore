@@ -1,8 +1,13 @@
 __pycache__
 *.pyc
 *.pyo
+/monkeytype.sqlite3
 /CocoPy.egg-info
 /build
 /dist
 /.eggs
 /testSuite/tmp
+/*.srctrlbm
+/*.srctrldb
+/.pytest_cache
+/.hypothesis

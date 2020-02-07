@@ -1,5 +1,4 @@
 include LICENSE.md
 include *.md
-include *.frame
-include testSuite
 include .editorconfig
+include-global .json

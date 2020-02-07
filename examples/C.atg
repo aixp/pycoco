@@ -12,6 +12,7 @@ CHARACTERS
   chars    = CHR(32) .. CHR(255) - "'" .
   strings  = CHR(32) .. CHR(255) - '"'.
   macros   = ANY - eol .
+  space    = ' '
 
 TOKENS
   identifier = ( "_" | letter) { "_" | letter | digit } .
@@ -26,7 +27,7 @@ PRAGMAS
 
 COMMENTS FROM "/*" TO "*/"
 
-IGNORE tab + eol + CHR(13)
+IGNORE space + tab + eol + CHR(13)
 
 PRODUCTIONS
 

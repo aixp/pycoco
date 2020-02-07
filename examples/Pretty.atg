@@ -50,7 +50,7 @@ TOKENS
 
 COMMENTS FROM "(*" TO "*)" NESTED
 
-IGNORE cr + lf + tab
+IGNORE ' ' + cr + lf + tab
 
 PRODUCTIONS
   Pretty =
