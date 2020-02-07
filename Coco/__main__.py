@@ -45,6 +45,8 @@
 #    $ { digit | letter }
 #  in the attributed grammar or as a command-line option
 #  -------------------------------------------------------------------------*/
+import plumbum.cli
+from .CLI import CocoArgs
 import sys
 import os
 from pathlib import Path
@@ -62,66 +64,65 @@ from .CodeGenerator import CodeGenerator
 from .setupInfo import MetaData
 
 
-ROOT_DIR = Path( __file__ ).absolute().parent
+ROOT_DIR = Path(__file__).absolute().parent
 
-from .CLI import CocoArgs
-import plumbum.cli
 
 class CocoCli(CocoArgs):
-   if 'version' in MetaData and 'author' in MetaData and 'author_email' in MetaData:
-      DESCRIPTION = 'Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n' % ( MetaData[ 'version' ], MetaData[ 'author' ], MetaData[ 'author_email' ] )
-   else:
-      DESCRIPTION = 'Coco/R v??? for Python (May 16, 2007) - Translated by ??? (??)\nWE CANNOT RETRIEVE THE METADATA correctly, SOMETHING GONE WRONG, FIX IT: ' + repr(MetaData)
-   def main(self, ATGName:plumbum.cli.ExistingFile):
-      Tab.SetDDT( self )
-      ATGName = Path(ATGName)
-      dirName = ATGName.parent
-      fileName = ATGName.name
-      
-      if not self.outputDir:
-         self.outputDir=dirName
+	if "version" in MetaData and "author" in MetaData and "author_email" in MetaData:
+		DESCRIPTION = "Coco/R v%s for Python (May 16, 2007) - Translated by %s (%s)\n" % (MetaData["version"], MetaData["author"], MetaData["author_email"])
+	else:
+		DESCRIPTION = "Coco/R v??? for Python (May 16, 2007) - Translated by ??? (??)\nWE CANNOT RETRIEVE THE METADATA correctly, SOMETHING GONE WRONG, FIX IT: " + repr(MetaData)
 
-      # Setup the default frame directory
-      try:
-         if self.frameFileDir:
-            framesDir = self.frameFileDir
-         else:
-            framesDir = ROOT_DIR / 'frames'
-         CodeGenerator.frameDir = framesDir
-         Tab.frameDir           = framesDir
-      except:
-         pass
+	def main(self, ATGName: plumbum.cli.ExistingFile):
+		Tab.SetDDT(self)
+		ATGName = Path(ATGName)
+		dirName = ATGName.parent
+		fileName = ATGName.name
 
-      # Initialize the Scanner
-      try:
-         with ATGName.open('rt', encoding="utf-8") as s:
-            try:
-               strVal = s.read( )
-            except IOError:
-               raise RuntimeError( '-- Compiler Error: Failed to read from source file "%s"\n' % ATGName )
-      except IOError:
-         raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % ATGName )
+		if not self.outputDir:
+			self.outputDir = dirName
 
-      scanner = Scanner( strVal )
-      parser  = Parser( )
+		# Setup the default frame directory
+		try:
+			if self.frameFileDir:
+				framesDir = self.frameFileDir
+			else:
+				framesDir = ROOT_DIR / "frames"
+			CodeGenerator.frameDir = framesDir
+			Tab.frameDir = framesDir
+		except BaseException:
+			pass
 
-      Errors.Init(fileName, self.outputDir, Tab.ddt[5], parser.getParsingPos, parser.errorMessages)
-      Trace.Init(self.outputDir)
-      Tab.Init()
-      DFA.Init(fileName, dirName, self.outputDir)
+		# Initialize the Scanner
+		try:
+			with ATGName.open("rt", encoding="utf-8") as s:
+				try:
+					strVal = s.read()
+				except IOError:
+					raise RuntimeError('-- Compiler Error: Failed to read from source file "%s"\n' % ATGName)
+		except IOError:
+			raise RuntimeError('-- Compiler Error: Cannot open file "%s"' % ATGName)
 
-      CodeGenerator.sourceDir = dirName
-      CodeGenerator.frameDir  = Tab.frameDir
-      CodeGenerator.outputDir = self.outputDir
-      
-      ParserGen.Init(fileName, dirName)
-      DriverGen.Init(fileName, dirName, self.outputDir)
-      parser.Parse( scanner )
-      Errors.Summarize( scanner.buffer )
-      Trace.Close()
-      if Errors.count != 0:
-         return 1
+		scanner = Scanner(strVal)
+		parser = Parser()
+
+		errors = Errors(fileName, self.outputDir, Tab.ddt[5], parser.getParsingPos, parser.errorMessages)
+		trace = Trace(self.outputDir)
+		tab = Tab()
+		dfa = DFA(fileName, dirName, self.outputDir)
+
+		CodeGenerator.sourceDir = dirName
+		CodeGenerator.frameDir = tab.frameDir
+		CodeGenerator.outputDir = self.outputDir
+
+		pg = ParserGen(fileName, dirName)
+		dg = DriverGen(fileName, dirName, self.outputDir)
+		parser.Parse(scanner)
+		errors.Summarize(scanner.buffer)
+		Trace.Close()
+		if errors.count != 0:
+			return 1
 
 
-if __name__=="__main__":
-   CocoCli.run()
+if __name__ == "__main__":
+	CocoCli.run()

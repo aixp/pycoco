@@ -27,39 +27,39 @@
 #-------------------------------------------------------------------------*/
 import os
 from pathlib import Path
+
 from .Errors import Errors
 from .Core import Tab
 from .CodeGenerator import CodeGenerator
 
-class DriverGen( object ):
-   EOF            =  -1
-   CR             =  '\r'
-   LF             =  '\n'
 
-   srcName        =  ''         # name of the attributed grammar file
-   srcDir         =  ''         # directory of attributed grammar file
-   outDir         =  ''         # directory of attributed grammar file
-   
-   codeGen        = CodeGenerator( )
+class DriverGen(object):
+	EOF = -1
+	CR = "\r"
+	LF = "\n"
 
-   @staticmethod
-   def WriteDriver( ):
-      fr = str( Tab.gramSy.name + '.frame' )
-      fn = Tab.gramSy.name + '.py'
-      fn = str(fn)
-      DriverGen.codeGen.openFiles( [ fr, 'Driver.frame' ], Tab.gramSy.name + '.atg', fn, True )
-      DriverGen.codeGen.CopyFramePart( '-->begin' )
-      #DriverGen.codeGen.CopyFramePart( '-->class' )
-      #DriverGen.codeGen.write( Tab.gramSy.name )
-      DriverGen.codeGen.CopyFramePart( '$$$' )
-      DriverGen.codeGen.close( )
-      os.chmod(__class__.outDir / fn, 0o755)
+	srcName = ""  # name of the attributed grammar file
+	srcDir = ""  # directory of attributed grammar file
+	outDir = ""  # directory of attributed grammar file
 
-   @staticmethod
-   def Init( f: str, dir: Path, outDir: Path):
-      assert isinstance( f, str )
-      assert isinstance( dir, Path )
-      assert isinstance( outDir, Path )
-      DriverGen.srcName = f
-      DriverGen.srcDir  = dir
-      DriverGen.outDir  = outDir
+	codeGen = CodeGenerator()
+
+	def WriteDriver(self):
+		fr = str(Tab.gramSy.name + ".frame")
+		fn = Tab.gramSy.name + ".py"
+		fn = str(fn)
+		self.codeGen.openFiles([fr, "Driver.frame"], Tab.gramSy.name + ".atg", fn, True)
+		self.codeGen.CopyFramePart("-->begin")
+		#self.codeGen.CopyFramePart( '-->class' )
+		#self.codeGen.write( Tab.gramSy.name )
+		self.codeGen.CopyFramePart("$$$")
+		self.codeGen.close()
+		os.chmod(__class__.outDir / fn, 0o755)
+
+	def __init__(self, f: str, dir: Path, outDir: Path) -> None:
+		assert isinstance(f, str)
+		assert isinstance(dir, Path)
+		assert isinstance(outDir, Path)
+		self.srcName = f
+		self.srcDir = dir
+		self.outDir = outDir

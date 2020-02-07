@@ -27,81 +27,84 @@
 #-------------------------------------------------------------------------
 from .Trace import Trace
 
-class CharClass( object ):
-   classes = [ ]
-   dummyName = ord('A')
+from typing import Optional, Set, Union
 
-   charSetSize = 256     # must be a multiple of 16
 
-   def __init__( self, name, s ):
-      assert isinstance( name, str )
-      assert isinstance( s, set )
-      if name == "#":
-         name = "#" + chr(__class__.dummyName)
-         self.__class__.dummyName += 1
-      self.n = len(__class__.classes)       # class number
-      self.name = name            # class name
-      self.set = s                # set representing the class
-      self.__class__.classes.append(self)
+class CharClass(object):
+	classes = []
+	dummyName = ord("A")
 
-   @staticmethod
-   def Find( nameOrSet ):
-      assert isinstance( nameOrSet, (str, set) )
-      if isinstance(nameOrSet,str):
-         name = nameOrSet
-         for c in __class__.classes:
-            if c.name == name:
-               return c
-         return None
-      else:
-         s = nameOrSet
-         for c in __class__.classes:
-            if s == c.set: #Sets.Equals(s, c.set):
-               return c
-         return None
+	charSetSize = 256  # must be a multiple of 16
 
-   @staticmethod
-   def Set( i ):
-      assert isinstance( i, int )
-      return __class__.classes[i].set
+	def __init__(self, name: str, s: Union[Set[int], Set[Union[int, str]]]) -> None:
+		assert isinstance(name, str)
+		assert isinstance(s, set)
+		if name == "#":
+			name = "#" + chr(__class__.dummyName)
+			self.__class__.dummyName += 1
+		self.n = len(__class__.classes)  # class number
+		self.name = name  # class name
+		self.set = s  # set representing the class
+		self.__class__.classes.append(self)
 
-   @staticmethod
-   def Ch( ch ):
-      assert isinstance( ch, str ) or isinstance( ch, int )
-      if isinstance( ch, str ):
-         ch = ord(ch)
-      if ch < ord(' ') or ch >= 127 or ch == ord('\'') or ch == ord('\\'):
-         return str(ch)
-      else:
-         return "'" + chr(ch) + "'"
+	@staticmethod
+	def Find(nameOrSet: Union[Set[int], str]) -> Optional["CharClass"]:
+		assert isinstance(nameOrSet, (str, set))
+		if isinstance(nameOrSet, str):
+			name = nameOrSet
+			for c in __class__.classes:
+				if c.name == name:
+					return c
+			return None
+		else:
+			s = nameOrSet
+			for c in __class__.classes:
+				if s == c.set:  # Sets.Equals(s, c.set):
+					return c
+			return None
 
-   @staticmethod
-   def WriteClasses( ):
-      for c in __class__.classes:
-         Trace.Write(str(c.name), -10)
-         Trace.Write(': ')
-         c.WriteSet( )
-         Trace.WriteLine()
-      Trace.WriteLine()
+	@staticmethod
+	def Set(i: int) -> Union[Set[int], Set[Union[int, str]]]:
+		assert isinstance(i, int)
+		return __class__.classes[i].set
 
-   def WriteSet( self ):
-      s = self.set.copy()
-      try:
-         s.remove('ANYCHAR')
-      except KeyError:
-         pass
+	@staticmethod
+	def Ch(ch):
+		assert isinstance(ch, str) or isinstance(ch, int)
+		if isinstance(ch, str):
+			ch = ord(ch)
+		if ch < ord(" ") or ch >= 127 or ch == ord("'") or ch == ord("\\"):
+			return str(ch)
+		else:
+			return "'" + chr(ch) + "'"
 
-      i = 0
-      mx = max(s) + 1
-      while i < mx:
-         while i < mx and (i not in s):
-            i += 1
-         if i == mx:
-            break
-         j = i
-         while i < mx and (i in s):
-            i += 1
-         if j < (i - 1):
-            Trace.Write(str(self.__class__.Ch(j)) + ".." + str(self.__class__.Ch(i-1)) + " ")
-         else:
-            Trace.Write(str(self.__class__.Ch(j) + " "))
+	@staticmethod
+	def WriteClasses():
+		for c in __class__.classes:
+			Trace.Write(str(c.name), -10)
+			Trace.Write(": ")
+			c.WriteSet()
+			Trace.WriteLine()
+		Trace.WriteLine()
+
+	def WriteSet(self):
+		s = self.set.copy()
+		try:
+			s.remove("ANYCHAR")
+		except KeyError:
+			pass
+
+		i = 0
+		mx = max(s) + 1
+		while i < mx:
+			while i < mx and (i not in s):
+				i += 1
+			if i == mx:
+				break
+			j = i
+			while i < mx and (i in s):
+				i += 1
+			if j < (i - 1):
+				Trace.Write(str(self.__class__.Ch(j)) + ".." + str(self.__class__.Ch(i - 1)) + " ")
+			else:
+				Trace.Write(str(self.__class__.Ch(j) + " "))

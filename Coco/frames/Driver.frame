@@ -41,28 +41,28 @@ dirName, fileName = os.path.split(srcName)
 
 # Initialize the Scanner
 try:
-   s = open( fileName, 'rt', encoding="utf-8" )
-   try:
-      strVal = s.read( ).decode( locale.getpreferredencoding() )
-   except IOError:
-      sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % fileName )
+	s = open(fileName, "rt", encoding="utf-8")
+	try:
+		strVal = s.read().decode(locale.getpreferredencoding())
+	except IOError:
+		sys.stdout.write('-- Compiler Error: Failed to read from source file "%s"\n' % fileName)
 
-   try:
-      s.close( )
-   except IOError:
-      raise RuntimeError( '-- Compiler Error: cannot close source file "%s"' % fileName )
+	try:
+		s.close()
+	except IOError:
+		raise RuntimeError('-- Compiler Error: cannot close source file "%s"' % fileName)
 except IOError:
-   raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % fileName )
+	raise RuntimeError('-- Compiler Error: Cannot open file "%s"' % fileName)
 
-scanner = Scanner( strVal )
-parser  = Parser( )
+scanner = Scanner(strVal)
+parser = Parser()
 
 Errors.Init(fileName, dirName, False, parser.getParsingPos, parser.errorMessages)
 
-parser.Parse( scanner )
-Errors.Summarize( scanner.buffer )
+parser.Parse(scanner)
+Errors.Summarize(scanner.buffer)
 
 if Errors.count != 0:
-   sys.exit(1)
+	sys.exit(1)
 
 $$$

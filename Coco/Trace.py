@@ -29,56 +29,53 @@
 import os
 from pathlib import Path
 
-class Trace( object ):
-   fileName = ''
-   trace    = None
 
-   @staticmethod
-   def Init( dir ):
-      assert isinstance( dir, Path )
-      Trace.fileName = dir / 'trace.txt'
-      try:
-         Trace.trace = Trace.fileName.open('wt', encoding="utf-8")
-      except IOError:
-         raise RuntimeError( '-- Compiler Error: could not open ' + Trace.fileName )
+class Trace(object):
+	fileName = ""
+	trace = None
 
-   @staticmethod
-   def formatString( s:str, w:int ):
-      ''' Returns a string with a minimum length of |w| characters
-      the string is left-adjusted if w < 0 and right-adjusted otherwise'''
-      assert isinstance( s, str )
-      assert isinstance( w, int )
-      b = ' ' * (abs(w) - len(s))
-      return b + s if w >= 0 else s + b
+	def __init__(self, dir: Path) -> None:
+		assert isinstance(dir, Path)
+		self.fileName = dir / "trace.txt"
+		try:
+			self.trace = self.fileName.open("wt", encoding="utf-8")
+		except IOError:
+			raise RuntimeError("-- Compiler Error: could not open " + Trace.fileName)
 
-   @staticmethod
-   def Write( s:str, w:int=None ):
-      '''writes a string with a maximum length of |w| characters'''
-      assert isinstance( s, str )
-      assert isinstance( w, int ) or (w is None)
-      if w is None:
-         Trace.trace.write( s )
-      else:
-         Trace.trace.write( Trace.formatString( s, w ) )
+	@staticmethod
+	def formatString(s: str, w: int) -> str:
+		""" Returns a string with a minimum length of |w| characters
+        the string is left-adjusted if w < 0 and right-adjusted otherwise"""
+		assert isinstance(s, str)
+		assert isinstance(w, int)
+		b = " " * (abs(w) - len(s))
+		return b + s if w >= 0 else s + b
 
-   @staticmethod
-   def WriteLine( s:str=None, w:int=None ):
-      assert isinstance( s, str ) or (s is None)
-      assert isinstance( w, int ) or (w is None)
-      if s is not None:
-         if w is not None:
-            Trace.trace.write( Trace.formatString( s, w ) )
-         else:
-            Trace.trace.write( s )
+	def Write(self, s: str, w: int = None):
+		"""writes a string with a maximum length of |w| characters"""
+		assert isinstance(s, str)
+		assert isinstance(w, int) or (w is None)
+		if w is None:
+			self.trace.write(s)
+		else:
+			self.trace.write(self.formatString(s, w))
 
-      Trace.trace.write( '\n' )
+	def WriteLine(self, s: str = None, w: int = None):
+		assert isinstance(s, str) or (s is None)
+		assert isinstance(w, int) or (w is None)
+		if s is not None:
+			if w is not None:
+				self.trace.write(self.formatString(s, w))
+			else:
+				self.trace.write(s)
 
-   @staticmethod
-   def Close( ):
-      Trace.trace.close( )
-      stat = os.stat( str(Trace.fileName) )
-      if stat.st_size == 0:
-         os.remove( Trace.fileName )
-      else:
-         print()
-         print('trace output is in', Trace.fileName.parent)
+		self.trace.write("\n")
+
+	def Close(self) -> None:
+		self.trace.close()
+		stat = os.stat(str(Trace.fileName))
+		if stat.st_size == 0:
+			os.remove(Trace.fileName)
+		else:
+			print()
+			print("trace output is in", Trace.fileName.parent)
