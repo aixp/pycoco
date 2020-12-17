@@ -1,6 +1,5 @@
 __pycache__
-*.pyc
-*.pyo
+*.py[co]
 /monkeytype.sqlite3
 /CocoPy.egg-info
 /build

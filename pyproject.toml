@@ -1,5 +1,59 @@
 [build-system]
-requires = ["setuptools>=44", "wheel", "setuptools_scm[toml]>=3.4.3"]
+requires = ["setuptools>=61.2.0", "setuptools_scm[toml]>=3.4.3"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "CocoPy"
+authors = [{name = "Ron Longo", email = "ron.longo@cox.net"}]
+description = "Python implementation of the famous CoCo/R LL(k) compiler generator."
+readme = "ReadMe.md"
+keywords = ["parser", "generator"]
+license = {text = "GPL-3.0"}
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Environment :: Console",
+	"Intended Audience :: Developers",
+	"Intended Audience :: Education",
+	"Intended Audience :: Information Technology",
+	"Intended Audience :: Science/Research",
+	"License :: OSI Approved :: GNU General Public License (GPL)",
+	"Natural Language :: English",
+	"Programming Language :: Python",
+	"Topic :: Scientific/Engineering",
+	"Topic :: Scientific/Engineering :: Human Machine Interfaces",
+	"Topic :: Scientific/Engineering :: Information Analysis",
+	"Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+	"Topic :: Software Development :: Code Generators",
+	"Topic :: Software Development :: Compilers",
+	"Topic :: Software Development :: Interpreters",
+	"Topic :: Software Development :: Pre-processors",
+	"Topic :: System :: Shells",
+	"Topic :: Text Processing :: General",
+	"Topic :: Text Processing :: Linguistic",
+]
+requires-python = ">=3.4"
+dependencies = ["astor"]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/UniGrammar/CoCoPy"
+"Original Homepage" = "https://ssw.uni-linz.ac.at/Research/Projects/Coco/"
+"Original User Manual" = "https://ssw.uni-linz.ac.at/Research/Projects/Coco/Doc/UserManual.pdf"
+"Other Impls" = "https://github.com/SSW-CocoR"
+
+[tool.setuptools]
+zip-safe = true
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["Coco", "Coco.*", "CoCoRuntime", "CoCoRuntime.*"]
+
+[tool.setuptools.package-data]
+documentation = ["*"]
+examples = ["*"]
+frames = ["*"]
+pimaker = ["*"]
+sources = ["*"]
+testsuite = ["*"]
 
 [tool.setuptools_scm]
