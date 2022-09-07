@@ -186,7 +186,7 @@ class MyScanner(Scanner):
 
 	def scan3(self, state: int, apx: int, buf: str) -> typing.Tuple[typing.Optional[int], ScannerEnum, int, str]:
 		if state == 20:
-			if "0" <= self.ch <= "9" or "A" <= self.ch <= "Z" or "a" <= self.ch <= "z":
+			if "0" <= self.ch <= "9" or "A" <= self.ch <= "Z" or self.ch == "_" or "a" <= self.ch <= "z":
 				buf += str(self.ch)
 				self.NextCh()
 				return 20, self.t.kind, apx, buf
@@ -200,7 +200,7 @@ class MyScanner(Scanner):
 				return 21, self.t.kind, apx, buf
 			return None, self.__class__.ENUM.number_Sym, apx, buf
 		if state == 22:
-			if "0" <= self.ch <= "9" or "A" <= self.ch <= "Z" or "a" <= self.ch <= "z":
+			if "0" <= self.ch <= "9" or "A" <= self.ch <= "Z" or self.ch == "_" or "a" <= self.ch <= "z":
 				buf += str(self.ch)
 				self.NextCh()
 				return 22, self.t.kind, apx, buf

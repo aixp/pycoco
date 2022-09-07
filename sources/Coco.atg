@@ -49,7 +49,7 @@ COMPILER Coco
 #-------------------------------------------------------------------------
 
 CHARACTERS
-	letter	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".
+	letter	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_".
 	digit		= "0123456789".
 	cr		= '\r'.
 	lf		= '\n'.
