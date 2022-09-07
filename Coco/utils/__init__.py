@@ -22,10 +22,10 @@ import astor
 try:
 	import isort
 
-	isort_obj = isort.SortImports(file_contents="")
+	isort_cfg = isort.api.Config()
 
 	def classifyImportModuleName(moduleName: str) -> str:
-		return isort_obj.place_module(moduleName)
+		return isort.api.place_module(moduleName, isort_cfg)
 
 except ImportError:
 
