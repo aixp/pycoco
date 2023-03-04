@@ -18,7 +18,7 @@ TOKENS
   number     = digit { digit} .
   string     =  "'" noquote1 {noquote1} "'" | '"' noquote2 {noquote2} '"' .
 
-IGNORE  CHR(9) .. CHR(13)
+IGNORE  ' ' + CHR(9) .. CHR(13)
 
 PRODUCTIONS
    Clang1             =  "PROGRAM" ProgIdentifier ";"

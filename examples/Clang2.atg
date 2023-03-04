@@ -7,7 +7,7 @@ COMPILER Clang2
    @staticmethod
    def NewLine():
       sys.stdout.write( '\n' )
-      for i in xrange( 0, level ):
+      for i in range( 0, level ):
          sys.stdout.write( '   ' )
 
    @staticmethod
@@ -63,7 +63,7 @@ TOKENS
 
 COMMENTS FROM "{" TO "}"  NESTED
 
-IGNORE  CHR(9) .. CHR(13)
+IGNORE  ' ' + CHR(9) .. CHR(13)
 
 PRODUCTIONS
 

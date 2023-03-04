@@ -43,16 +43,12 @@ dirName, fileName = os.path.split(srcName)
 
 # Initialize the Scanner
 try:
-   s = open( srcName, 'r' )
-   try:
-      strVal = s.read( )
-   except IOError:
-      sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % fileName )
+   with open( srcName, 'rt', encoding="utf-8") as s:
+      try:
+         strVal = s.read( )
+      except IOError:
+         sys.stdout.write( '-- Compiler Error: Failed to read from source file "%s"\n' % fileName )
 
-   try:
-      s.close( )
-   except IOError:
-      raise RuntimeError( '-- Compiler Error: cannot close source file "%s"' % fileName )
 except IOError:
    raise RuntimeError( '-- Compiler Error: Cannot open file "%s"' % fileName )
 

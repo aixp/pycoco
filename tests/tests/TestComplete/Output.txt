@@ -1,0 +1,5 @@
+checking
+  No production for B
+1 errors detected
+
+trace output is in trace.txt

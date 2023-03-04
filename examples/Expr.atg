@@ -26,7 +26,7 @@ TOKENS
 
 COMMENTS FROM "--" TO eol
 
-IGNORE eol+tab
+IGNORE ' ' + eol + tab
 
 /*--------------------Parser Specification -------------------*/
 

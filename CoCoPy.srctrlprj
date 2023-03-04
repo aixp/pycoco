@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config>
+	<source_groups>
+		<source_group_ffffffff-ffff-ffff-ffff-ffffffffffff>
+			<name>Python Source Group</name>
+			<source_extensions>
+				<source_extension>.py</source_extension>
+			</source_extensions>
+			<source_paths>
+				<source_path>./Coco</source_path>
+				<source_path>./CoCoRuntime</source_path>
+			</source_paths>
+			<status>enabled</status>
+			<type>Python Source Group</type>
+		</source_group_ffffffff-ffff-ffff-ffff-ffffffffffff>
+	</source_groups>
+	<version>8</version>
+</config>

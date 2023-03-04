@@ -1,0 +1,7 @@
+checking
+  Test deletable
+  I deletable
+parser + scanner generated
+0 errors detected
+
+trace output is in trace.txt

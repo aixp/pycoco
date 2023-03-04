@@ -1,0 +1,9 @@
+checking
+  LL(1) warning in A: an ANY node that matches no symbol
+  LL(1) warning in B: an ANY node that matches no symbol
+  LL(1) warning in C: an ANY node that matches no symbol
+  LL(1) warning in D: an ANY node that matches no symbol
+parser + scanner generated
+0 errors detected
+
+trace output is in trace.txt

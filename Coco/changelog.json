@@ -1,0 +1,65 @@
+{
+	"2.0.0rc": {
+		"breaking changes": [
+			"Python 3 support has been implemented, Python 2 support has been dropped.",
+			"Spaces are now not ignored unconditionally. If your grammar uses `IGNORES` you must specify them! If you don't, they will still be ignored by default.",
+			"Migrated from dumb strings to `ast`, which has greatly improved the structure of the code and allowed further improvements. The cost is that the comments and whitespaces are not preserved, since there are no nodes for them. Transforming asts into strings is done using `astor` library. Optionally (if installed) the result is postprocessed by `black`.",
+			"Added types, reformatted source. Now we use tabs (a tab is now considered to be completion to 4 spaces). Enable `editorconfig` in your favorite editor if you want to see the sources right.",
+			"Implemented python code detection. Instead of custom and incomplete parsing as was done earlier we now use python parser. The first syntax error in python code is considered to be an end of python code and continuation of CoCo/R grammar.",
+			"Implemented optional typing for parameters. Typing uses Java/C++/C# syntax (type name), not python one (name: type) for compatibility",
+			"Moved the components used by every parser into `CoCoRuntime` module. It provides abstract base classes with some props that must be populated in generated code",
+			"Started eliminating global state. Stuff earlier saved into classes now is saved into instances.",
+			"Dropped frame files support. Use object oriented programming instead.",
+			"`Copyright.frame` is not used anymore (in fact it has been never used in CoCoPy, but CoCo/R manual mentions it). Instead put copyright header into `__copyright__` variable, and it will be inserted in both `Scanner` and `Parser`",
+			"Dropped generation of drivers. They were not really generated, just copied.",
+			"(Non)terminals enum values are now stored in a single shared `IntEnum` rather than in parser and lexer classes themselves.",
+			"Added a mode to use lookups from the enum instead of raw numbers in generated code. Should improve readability and simplify debugging and diffing the generated code",
+			"Now we use `setup.cfg` and `pyproject.toml` for fetching versions from git. Installation from the sources other than git is deprecated.",
+			"Refactored keywords lookup. Now they are not matched using elif ladders, instead they are stored in a map",
+			"Optimized error messages storage. Since their numbers are sequential, now they are stored in a `list` rather than a `dict`.",
+			"Dropped numeric values (that initially were not in a enum, just untidy mess) mixing node types, symbol types and state types. Now we have a dedicated class for each."
+		],
+		"changes": [
+			"Optionally optimized keywords lookup using prefix trees using `datrie` library. Automatically enabled, if `datrie` is installed."
+		],
+		"bugfixes": [],
+		"contributions": [
+			"Most of the stuff is done by KOLANICH, who seems to be a kind of maintainer (but not really a maintainer, don't expect constant improvments) of this shit (since the previous one hasn't responded for a long time).",
+			"Some minor improvements by Maxim Barabash."
+		]
+	},
+
+	"1.1.0rc": {
+		"changes": ["Coco/R now passes all tests of the official Coco/R test suite"],
+		"bugfixes": [],
+		"contributions": []
+	},
+
+	"1.0.10b2": {
+		"changes": ["Updated builder and renamed it to pimaker"],
+		"bugfixes": ["Many code generator bug fixes"],
+		"contributions": ["Wayne Wiitanen has contributed a version of the EXPR example that works with CocoPy."]
+	},
+
+	"1.0.9b2": {
+		"changes": [
+			"Simplified the Errors class and error handling.",
+			"Completed a first version of my builder application."
+		],
+		"bugfixes": ["Repaired a bug in SemErr() didn't work properly."]
+	},
+
+	"1.0.7b1": {
+		"changes": [],
+		"bugfixes": ["Repaired LINUX bug found in v1.0.6b1"]
+	},
+
+	"1.0.6b1": {
+		"changes": [
+			"Completed a beta version of builder.py",
+			"Updated README.txt to describe builder.py",
+			"Removed HowToBootstrap.txt from Documents"
+		],
+		"bugfixes": ["Coco.atg does not bootstrap on LINUX."]
+	}
+}

@@ -1,0 +1,8 @@
+checking
+  Test deletable
+  Del deletable
+  LL(1) warning in Test: contents of [...] or {...} must not be deletable
+parser + scanner generated
+0 errors detected
+
+trace output is in trace.txt

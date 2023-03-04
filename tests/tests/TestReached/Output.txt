@@ -1,0 +1,5 @@
+checking
+  B cannot be reached
+1 errors detected
+
+trace output is in trace.txt

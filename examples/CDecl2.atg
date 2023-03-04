@@ -13,7 +13,7 @@ TOKENS
   number = digit { digit } .
   name = letter { letter } .
 
-IGNORE CHR(9) .. CHR(13)
+IGNORE ' ' + CHR(9) .. CHR(13)
 
 PRODUCTIONS
 

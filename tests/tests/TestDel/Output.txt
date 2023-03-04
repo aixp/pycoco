@@ -1,0 +1,9 @@
+checking
+  A deletable
+  B deletable
+  C deletable
+  D deletable
+parser + scanner generated
+0 errors detected
+
+trace output is in trace.txt

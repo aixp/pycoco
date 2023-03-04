@@ -25,7 +25,7 @@ TOKENS
 
 COMMENTS FROM '{' TO '}'
 
-IGNORE cr + lf + tab
+IGNORE ' ' + cr + lf + tab
 
 PRODUCTIONS
 
